@@ -1,0 +1,396 @@
+#!/bin/sh
+# Filename:      grml-crypt
+# Purpose:       Program to format, mount and unmount encrypted devices/files
+# Authors:       Michael Gebetsroither <gebi@grml.org>
+# Bug-Reports:   see http://grml.org/bugs/
+# License:       This file is licensed under the GPL v2.
+# Latest change: Mon Aug 08 11:37:20 CEST 2005
+################################################################################
+
+
+###
+### __INCLUDES
+###
+. /etc/grml/sh-lib
+#. /etc/grml/sysexits-sh
+
+
+
+###
+### __VARIABLES
+###
+
+verbose_=0
+DEV_MAPPER_="/dev/mapper"
+CRYPTSETUP_="cryptsetup"
+IS_IMAGE_='false'
+SIZE_="10"
+SIZE_SET_='false'
+FSTYPE_="vfat"
+TARGET_=""
+VERIFY_PW_=""
+MKFS_=""
+DM_NAME_=""
+DM_PATH_=""
+ACTION_=""
+DM_PREFIX_="grml-crypt_"
+FORCE_='false'
+OVERWRITE_SOURCE_DEV_='/dev/urandom'
+OPTIMIZED_MODE_SET_='false'
+OPTIMIZING_LEVEL_=0
+CIPHER_SIZE_="128"
+CIPHER_="aes-cbc-essiv:sha256"
+ITERATION_TIME_="1"
+ADDITIONAL_CRYPTSETUP_ARGS_=""
+READONLY_SET_='false'
+ADDITIONAL_MOUNT_ARGS_=""
+BATCH_MODE_="--batch-mode"
+
+###
+### __FUNCTIONS
+###
+
+function printUsage
+{
+  cat <<EOT
+Usage: "$PROG_NAME__" [OPTIONS] action <device/file> [mountpoint]
+
+$PROG_NAME__ is a wrapper arround cryptsetup with LUKS support to format a device
+
+OPTIONS:
+   -s         size of the loop-filesystem to create, in MB (default=$SIZE_)
+   -t         type of filesystem (default=$FSTYPE_)
+   -r         read only mode (fully supported only by start)
+   -z         insecure mode, using /dev/zero for most of the initialisation (INSECURE!)
+   -o         optimized initialisation mode (should be as secure as the default but faster)
+   -y         verifies the passphrase by asking for it twice
+   -f         force file overwriting in format mode and/or disable confirmation dialog
+   -m         additional arguments to mount
+   -v         verbose (show what is going on, v++)
+   -h         this help text
+
+CRYPTSETUP FORMAT OPTIONS:
+   -S         cipher size, could be 128, 192 or 256 (default=$CIPHER_SIZE_)
+   -C         cipher, should be aes-plain for pre-2.6.10 (default=$CIPHER_)
+   -I         iteration time spend with PBKDF2 password  processing in seconds (default=$ITERATION_TIME_)
+   -A         additional arguments for cryptsetup (only supportet by format)
+
+ACTIONS:
+   format  <device/file> [mountpoint]
+              Format a device or a file (is created with the given size if it
+              does not exist) with the given filesystem and mount it, if a
+              mountpoint was given.
+   start  <device/file> <mountpoint>
+              Mount the device/file in the mountpoint.
+   stop   <mountpoint>
+              Umount the given mountpoint (umount, luksClose, losetup -d)
+
+EOT
+}
+
+
+function getDMName
+{
+  device_="${1##*/}"
+  
+  # first trying normal devicename
+  tmp_="${DM_PREFIX_}${device_}"
+  if [ ! -e "$tmp_" ]; then
+    echo "$tmp_"
+    return 0
+  fi
+
+  # second trying uuid of luks
+  #uuid_=`execute "$CRYPTSETUP_ luksUUID $1"`
+  #if [[ $? == 0 ]]; then
+  #  echo "$prefix_$uuid_"
+  #  return 0
+  #fi
+  warn "could not create device-mapper name for $1"
+  return 1
+}
+
+
+function formatDevice
+{
+  type_="$1"  # could be donothing or init
+  ret_=0
+
+  args_="$VERIFY_PW_ $BATCH_MODE_ --key-size $CIPHER_SIZE_ --cipher $CIPHER_ --iter-time $ITERATION_TIME_ $ADDITIONAL_CRYPTSETUP_ARGS_"
+  #args_=`echo "$args_" |tr -s ' '`
+  execute "$CRYPTSETUP_ $args_ luksFormat $TARGET_" warn || return 1
+
+  execute "$CRYPTSETUP_ luksOpen $TARGET_ $DM_NAME_" warn \
+    "could not open $DM_PATH_ to create a filesystem on it!" || return 1
+  if [[ $type_ == 'init' && $OPTIMIZED_MODE_SET_ == 'true' ]]; then
+    echo "finishing optimized initialisation (this could take some time)"
+    # FIXME
+    execute "dd if=/dev/zero of=$DM_PATH_ bs=1M &>/dev/null" # || \
+    #  warn "could not finish optimized initialisation properly"
+    ret_=$?
+    # cutted out because of no space left on device error :(
+    #if [[ $ret_ != 0 ]]; then
+    #  execute "$CRYPTSETUP_ luksClose $DM_NAME_" warn
+    #  return 1
+    #fi
+  fi
+
+  execute "$MKFS_ $DM_PATH_ >/dev/null" warn
+  if [[ $? != 0 ]]; then
+    execute "$CRYPTSETUP_ luksClose $DM_NAME_"
+    warn "could not create filesystem on $DM_PATH_" 1
+    return 1
+  else
+    echo "Successully created $FSTYPE_ on encrypted $TARGET_"
+    return 0
+  fi
+} 
+
+
+function actionStart
+{
+  ret_=0
+  
+  # no mountpoint, by-by
+  if [[ "$MOUNT_POINT_" == "" ]]; then
+    printUsage
+    die 'no mountpoint given'
+  fi
+  if [ ! -d "$MOUNT_POINT_" ]; then
+    die "mountpoint $MOUNT_POINT_ does not exist"
+  fi
+  # removed due to unionfs problem isLuks does not work with filesystem images
+  # without losetup
+  #$CRYPTSETUP_ isLuks $TARGET_ || die "$TARGET_ is not a luks partition"
+
+  # TARGET (is/should be) a filesystem image
+  if [ ! -b "$TARGET_" ]; then
+    notice "Operating on a file"
+    isExistent "$TARGET_" die "image does not exist"
+    TARGET_=`findNextFreeLoop` || die "could not find a free loop device"
+
+    # TARGET_ is now /dev/loop<x>
+    execute "losetup $TARGET_ $ORIG_TARGET_" die
+  fi
+  cargs_=""
+  $READONLY_SET_ && cargs_='--readonly'
+  execute "$CRYPTSETUP_ $cargs_ luksOpen $TARGET_ $DM_NAME_" warn || execute "losetup -d $TARGET_" || \
+    die "could not luksOpen $TARGET_"
+  margs_=""
+  $READONLY_SET_ && margs_='-r'
+  execute "mount $margs_ $ADDITIONAL_MOUNT_ARGS_ $DM_PATH_ $MOUNT_POINT_" die
+}
+
+
+function actionStop
+{
+  mp_="$1"
+  ret_=0
+
+  isExistent "$mp_" die
+  tmp_=`realpath $mp_` || die "could not get realpath of $mp_"
+  dprint "realpath_=\"$tmp_\""
+  
+  dm_path_=`mount |grep "$tmp_ "` || die "$tmp_ is not mounted"
+  dprint "dm_path_=\"$dm_path_\""
+  dm_path_=`echo $dm_path_ |awk '{print $1}'` || die "could not get devicemapper name for $tmp_"
+  dprint "dm_path_=\"$dm_path_\""
+  
+  dm_name_="${dm_path_##*/}"
+  dprint "dm_name_=\"$dm_name_\""
+
+  dmsetup info $dm_name_ >/dev/null ||die "$dm_name_ is not aktive"
+  device_=`$CRYPTSETUP_ status $dm_name_ |awk '/device:/{print $2}'` || \
+    die "could not get underlying device of $dm_path_"
+  dprint "device_=\"$device_\""
+  
+  execute "umount $dm_path_" die "could not unmount $device_"
+  execute "$CRYPTSETUP_ luksClose $dm_name_" die "could not close $dm_path_"
+  echo "$device_" |grep loop &>/dev/null && execute "losetup -d $device_" \
+    die "could not delete loop device $device_" || \
+    execute "losetup -d $device_ &>/dev/null" eprint "could not delete loop device $device_, \
+this device could possible not be a loop device => maybe bogus error"
+  notice "$mp_ successfully unmountet/closed/deleted"
+}
+
+function yesDialog
+{
+  msg_="$1"
+  
+  echo "WARNING!" >&2
+  echo "========" >&2
+  echo -n "$msg_" >&2
+  echo -n " (type uppercase yes): " >&2
+  read input
+  if [[ $input == 'YES' ]]; then
+    return 0
+  fi
+
+  return 1
+}
+
+function actionFormat
+{
+  IS_IMAGE_='false'
+  ret_=0
+  init_='init'
+
+  if (( $SIZE_ < 3 )); then
+    die "the minimum size of an encrypted luks partition should be 2"
+  fi
+
+  # TARGET (is/should be) a filesystem image
+  if [ ! -b "$TARGET_" ]; then
+    notice "Operating on a file"
+    IS_IMAGE_='true'
+    if [ -e "$TARGET_" ]; then
+      $FORCE_ || die "file $TARGET_ does allready exist"
+      warn "overwriting file $TARGET_"
+      init_='donothing'
+    else
+      echo -n "Initialising file with "
+      if [[ $OPTIMIZED_MODE_SET_ == 'true' ]]; then
+        echo "optimized SECURE mode"
+        execute "dd if=/dev/zero of=$TARGET_ bs=1M count=${SIZE_} &>/dev/null" \
+          die "could not initialise $TARGET_ with /dev/zero"
+      else
+        if [[ $OVERWRITE_SOURCE_DEV_ == '/dev/zero' ]]; then
+          echo "INSERCURE mode"
+        else
+          echo "SECURE mode (taking /dev/urandom as source, this could take some time)"
+        fi
+        execute "dd if=$OVERWRITE_SOURCE_DEV_ of=$TARGET_ bs=1M count=${SIZE_} &>/dev/null" ||\
+          die "could not initialise $TARGET_ with $OVERWRITE_SOURCE_DEV_"
+      fi
+    fi
+
+    TARGET_=`findNextFreeLoop` || die "could not find a free loop device"
+
+    # TARGET_ is now /dev/loop<x>
+    execute "losetup $TARGET_ $ORIG_TARGET_" die
+    if [[ $OPTIMIZED_MODE_SET_ == 'true' || $OVERWRITE_SOURCE_DEV_ == '/dev/zero' ]]; then
+      execute "dd if=/dev/urandom of=$TARGET_ bs=1M count=2 &>/dev/null" \
+      die "could not initialise the fist 2MB of $TARGET_ with /dev/urandom"
+    fi
+    formatDevice "$init_"
+    ret_=$?
+  else
+    $FORCE_ || (yesDialog "Are you shure you want to overwrite $TARGET_ ?" || die 'You are not sure')
+    notice 'Operating on a device'
+    echo -n 'Initialising device with '
+    if [[ $OPTIMIZED_MODE_SET_ == 'true' ]]; then
+      echo "optimised SECURE mode"
+      execute "dd if=/dev/urandom of=$TARGET_ bs=1M count=2 &>/dev/null" ||\
+        die "could not initialise the first 2MB of $TARGET_ with /dev/urandom"
+    elif [[ $OVERWRITE_SOURCE_DEV_ != '/dev/zero' ]]; then
+      # default mode
+      echo "SECURE mode (taking /dev/urandom as source, this could take some time)"
+      execute "dd if=/dev/urandom of=$TARGET_ bs=1M &>/dev/null" ||\
+        die "could not initialise $TARGET_ with /dev/zero"
+    else
+      echo 'INSECURE mode (only initialising the fist 2MB with /dev/urandom)'
+      execute "dd if=/dev/urandom of=$TARGET_ bs=1M count=2 &>/dev/null" \
+        die "could not initialise the first 2MB of $TARGET_ with /dev/urandom"
+    fi
+
+    formatDevice "$init_"
+    ret_=$?
+  fi
+
+  # formatDevice was successfully
+  if (( $ret_ == 0 )); then
+    # a mountpoint was given (don't luksClose the device)
+    local mount_point_exists_='true'
+    test -d "$MOUNT_POINT_" || mount_point_exists_='false'
+
+    if [[ "$MOUNT_POINT_" != "" && "$mount_point_exists_" == 'true' ]]; then
+      $READONLY_SET_ && margs_='-r'
+      execute "mount $margs_ $ADDITIONAL_MOUNT_ARGS_ $DM_PATH_ $MOUNT_POINT_" die
+    else
+      $mount_point_exists_ || warn "mountpoint $MOUNT_POINT_ does not exist, not mounting. please use \"grml-crypt start $ORIG_TARGET_ <mountpoint>\" to start the device"
+      execute "$CRYPTSETUP_ luksClose $DM_NAME_" warn
+      $IS_IMAGE_ && execute "losetup -d $TARGET_" warn
+    fi
+  else
+    $IS_IMAGE_ && execute "losetup -d $TARGET_" warn
+  fi
+}
+
+
+
+###
+### __MAIN
+###
+
+while getopts "s:t:rzoyfm:hvS:C:I:A:" opt; do
+  case "$opt" in
+    s) SIZE_="$OPTARG"; SIZE_SET_='true' ;;
+    t) FSTYPE_="$OPTARG" ;;
+    r) READONLY_SET_='true' ;;
+    z) let OPTIMIZING_LEVEL_=$OPTIMIZING_LEVEL_+1
+        OVERWRITE_SOURCE_DEV_='/dev/zero'
+        warn 'initialising from INSECURE source /dev/zero' ;;
+    o) let OPTIMIZING_LEVEL_=$OPTIMIZING_LEVEL_+1
+        OPTIMIZED_MODE_SET_='true' ;;
+    y) VERIFY_PW_="--verify-passphrase" ;;
+    f) FORCE_='true' ;;
+    m) ADDITIONAL_MOUNT_ARGS_="$OPTARG" ;;
+    h) printUsage; exit ;;
+    v) let verbose_=$verbose_+1 ;;
+    S) CIPHER_SIZE_="$OPTARG" ;;
+    C) CIPHER_="$OPTARG" ;;
+    I) ITERATION_TIME_="$OPTARG" ;;
+    A) ADDITIONAL_CRYPTSETUP_ARGS_="$OPTARG" ;;
+    ?) printUsage; exit 64 ;;
+  esac
+done
+shift $(($OPTIND - 1))  # set ARGV to the first not parsed commandline parameter
+setVerbose $verbose_
+
+checkRoot die "You have to be root to use this program"
+disableSyslog
+
+if [[ $1 == 'help' ]]; then
+  printUsage
+  exit 0
+fi
+if (( $# < 2 )); then
+  printUsage
+  die "wrong number of arguments ($#)" 1
+fi
+if (( $OPTIMIZING_LEVEL_ > 1 )); then
+  printUsage
+  die "please choose ONE initialisation methode"
+fi
+TARGET_="$2"
+
+MKFS_="/sbin/mkfs.$FSTYPE_"
+if [ ! -x "$MKFS_" ]; then
+  die "invalid filesystem type \"$FSTYPE_\"" 1
+fi
+
+# use batch-mode if available
+$CRYPTSETUP_ $BATCH_MODE_ --help &>/dev/null;
+ret_=$?
+case "$ret_" in
+  0)  dprint "your cryptsetup understands --batch-mode" ;;
+  1)  BATCH_MODE_=""; notice "your cryptsetup does NOT understand --batch-mode, trying without" ;;
+  127)  die "could not execute cryptsetup" 127 ;;
+  *)  warn "problems executing $CRYPTSETUP_" $ret_
+esac
+
+DM_NAME_="`getDMName $TARGET_`"
+DM_PATH_="$DEV_MAPPER_/$DM_NAME_"
+ORIG_TARGET_="$TARGET_"
+MOUNT_POINT_="$3"
+
+case "$1" in
+  format) ACTION_='format'; actionFormat ;;
+  start)  ACTION_='start'; actionStart ;;
+  stop)  ACTION_='stop'; actionStop "$TARGET_" ;;
+  *)  printUsage ;;
+esac
+
+# END OF FILE
+################################################################################
+# vim:foldmethod=marker

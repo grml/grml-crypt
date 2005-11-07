@@ -1,0 +1,152 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH GRML-CRYPT 8 "AUG 9, 2005"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+grml-crypt \- Wrapper arround cryptsetup/losetup/mkfs/mount
+.SH SYNOPSIS
+.B grml-crypt
+.RI [OPTIONS] " action " <device/file> " [mountpoint]
+.br
+.SH DESCRIPTION
+This manual page documents briefly the
+.B grml-crypt program
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
+.\" respectively.
+\fBgrml-crypt\fP is a program that
+provides an easy wrapper arround cryptsetup, mkfs, losetup and mount.
+You could create a loopback mountet crypted filesystem with only one command, but grml-crypt works for normal devices also.
+.SH ACTIONS
+.TP
+.B format <device/file> [mountpoint]
+This command "formats" a device/file.
+If the second parameter is not a blockdevice grml-crupt assumes that it should operate in file modus. If the file does not allready exist it will be created with the given size.
+The first 2MB of a device (luks header) are initialised with /dev/urandom, the other space is initialised with the given initialisation. If grml-crypt is in file modus the first 2MB of the loop file are also initialised with /dev/urandom except where the file allready exist (with -f vor overwriting).
+Commands: [losetup], dd, cryptsetup luksFormat, cryptsetup luksOpen, [dd], mkfs, [mount]
+.TP
+.B start <device/file> <mountpoint>
+This command starts a encrypted device/file and mounts it to the given mountpoint.
+Commands: [losetup], cryptsetup luksOpen, mount
+.TP
+.B stop <mountpoint>
+This command stops a encrypted filesystem mountet at mountpoint.
+Even the loopdevice gets destroyed with this command.
+Commands: mount, dmsetup info, cryptsetup status, umount, cryptsetup luksClose, [losetup -d]
+.SH OPTIONS
+These program follow the long option style without dashes and 
+short options starting with one dash (`-').
+A summary of options is included below.
+.TP
+.B \-h, help
+Show summary of options.
+.TP
+.B \-v
+Show what is going on (more v => more output).
+.TP
+.B \-s (in MB, default=10)
+Give the size of loopfilesystem grml-crypt should create.
+.TP
+.B \-t (default=vfat)
+Give the type of the filesystem grml-crypt should create.
+/sbin/mkfs.<your choosen filesystem> should exist.
+.TP
+.B \-r
+Read-only mode. The device mapping AND the mountpoint will be made read-only.
+In format mode only the mountpoint could be made read-only.
+.TP
+.B \-z
+Insecure initialisation mode
+.TP
+.B \-o
+Optimized initialisation mode
+.TP
+.B \-y
+Verifies the password by asking for it twice during creation.
+.TP
+.B \-f
+Force overwriting and/or disable confirmation dialog.
+If the second parameter to format is an existing file and force is given, then the file will be used for the encrypted loop filesystem. ATTENTION: the file should be bigger than 2MB for LUKS only + the constraints from the filesystems itself (eg. xfs needs a minimum of 4096 blocks).
+.TP
+.B \-m
+Additional arguments passed through to mount. Could be like '-o noatime'.
+.SH CRYPTSETUP FORMAT OPTIONS
+.TP
+.B \-S (in bits, default=128)
+Cipher size used for the encryption. Usually 128, 192 or 256 (but higher maybe also possible)
+.TP
+.B \-C (default=aes-cbc-essiv:sha256)
+Cipher mode, should be aes-plain for pre-2.6.10. Look at /proc/crypto for other ciphers.
+.TP
+.B \-I (in seconds, default=1)
+The number of seconds to spend with PBKDF2 password processing. This time is comsumed for every key operation (format, start).
+.TP
+.B \-A (default="")
+Additional arguments to cryptsetup luksFormat.
+.SH INITIALISATION MODES
+.TP
+.B Default/Secure mode (no -o or -z given)
+This mode is the default. It should be quite secure.
+The device/file gets initialised with /dev/urandom. Except with an allready existing file and -f, where NO initialisation will be done (all other modes behave as usual).
+.TP
+.B Optimized secure mode (-o)
+In this mode only the first 2MB of the device/file are initialised with /dev/urandom.
+The encryption will be initialised and then the whole encrypted device is filled with /dev/zero.
+.TP
+.B Insecure mode (-z)
+In this mode only the first 2MB of the device/file are initialised with /dev/urandom.
+.SH EXAMPLES
+.TP
+.B grml-crypt -t xfs -o format /dev/hda4 /mnt/tmp
+Formats /dev/hda4 with xfs and apply optimized initialisation rules and mount it to /mnt/tmp
+.TP
+.B grml-crypt -t ext2 -z format /home/user/test.img /mnt/tmp
+Creates /home/user/test.img with 10MB and apply only insecure initialisation rules. Create an ext2 filesystem on it and mount it to /mnt/tmp.
+.TP
+.B grml-crypt -f -S 256 -C aes-plain -I 2 -A "--verify-passphrase" -m '-o noatime' -vvv format img /mnt/tmp
+Reuses the image img with no initialisation. The encryption is established with aes-plain with 256 bit keysize and an iteration time of 2 seconds. Cryptsetup is advised to verify the password by asking for it twice. Mount it to /mnt/tmp with '-o noatime'. And print what is going on (-vvv).
+.SH ENCRYPT AN USBSTICK
+.TP
+.B grml-crypt -t ext2 -z format /dev/external1
+This command formats your usbstick which hopely is at /dev/external1 (please verify!!) with ext2 and nearly no initialisation.
+You could als give the format action a mountpoint. In this case your crypto-partition gets also mounted on this mountpoint.
+.TP
+.B grml-crypt start /dev/external1 /mnt/tmp
+This command asks you for the right passphrase for your crypto-partition and tries to mount it to /mnt/tmp.
+.TP
+.B grml-crypt stop /mnt/tmp
+This command removes your crypto-partition cleanly out of the system (umount, cryptsetup luksClose, [losetup -d]).
+.SH ENCRYPTED LOOPFILESYSTEM ON USBSTICK
+.TP
+.B mount /mnt/external1
+To mount your usb-stick on /mnt/external1 (please verify!!).
+.TP
+.B grml-crypt -o -t vfat -s 50 /mnt/external1/secure.img /mnt/tmp
+This command creates a 50MB big file, encrypted with the default options and with vfat (also known as fat32). The optimized initialisation mode will be used for this file (without -o this could take REALLY LONG).
+This command _also_ starts your cryptofile and mounts it on /mnt/tmp
+.TP
+.B grml-crypt stop /mnt/tmp
+This command removes your crypto-partition cleanly out of the system (umount, cryptsetup luksClose, [losetup -d]).
+.TP
+.B umount /mnt/external1
+Guess what ;)?
+.SH SEE ALSO
+.BR cryptsetup (8)
+.SH AUTHOR
+grml-crypt was written by Michael Gebetsroither <gebi@grml.org>.
+.PP
+This manual page was written by Michael Gebetsroither <gebi@grml.org>.

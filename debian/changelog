@@ -1,0 +1,75 @@
+grml-crypt (0.10) unstable; urgency=low
+
+  * added another example to the manpage
+  * fixed a few typos in the manpage
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Sat, 22 Oct 2005 14:50:07 +0200
+
+grml-crypt (0.09) unstable; urgency=low
+
+  * added usage example for usb-stick encryption to manpage 
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Sat, 22 Oct 2005 03:05:58 +0200
+
+grml-crypt (0.08) unstable; urgency=low
+
+  * added checks against invalied mountpoints
+  * fixed a few small bugs
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Sat, 22 Oct 2005 03:05:52 +0200
+
+grml-crypt (0.07) unstable; urgency=low
+
+  * added --batch-mode detection for cryptsetup
+  * added $CRYPTSETUP_
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Wed, 14 Sep 2005 20:19:19 +0200
+
+grml-crypt (0.06) unstable; urgency=low
+
+  * fixed yesDialog with file which does not exist 
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Mon, 15 Aug 2005 23:40:44 +0200
+
+grml-crypt (0.05) unstable; urgency=low
+
+  * added confirmation question
+  * manpage fixes
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Mon, 15 Aug 2005 23:34:16 +0200
+
+grml-crypt (0.04) unstable; urgency=low
+
+  * fixed a bug with filesystem images on unionfs 
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Wed, 10 Aug 2005 12:19:36 +0200
+
+grml-crypt (0.03) unstable; urgency=low
+
+  * added cmdarg -S cipher size
+  * added cmdarg -C ciper
+  * added cmdarg -I number of iterations
+  * added cmdarg -A additional arguments passed through to cryptsetup
+  * added cmdarg -r setup mapping and mount in readonly mode
+  * added cmdarg -m additional arguments passed through to mount
+  * added all new cmdargs to manpage
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Wed, 10 Aug 2005 01:59:15 +0200
+
+grml-crypt (0.02) unstable; urgency=low
+
+  * small manpage fix 
+  * removed function findNextFreeLoop, because it's now in sh-lib
+  * removed a few testing functions
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Tue,  9 Aug 2005 16:07:38 +0200
+
+grml-crypt (0.01) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Tue,  9 Aug 2005 12:46:08 +0200
+
+Local variables:
+mode: debian-changelog
+End:
