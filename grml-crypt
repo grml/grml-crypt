@@ -86,6 +86,13 @@ ACTIONS:
               Umount the given mountpoint (umount, luksClose, losetup -d)
 
 EOT
+
+  isGrml && cat <<EOT
+NOTICE:
+   losetup does _NOT_ work on unionfs => grml-crypt with a filesystem image does ONLY
+   work if the image is on a tmpfs (eg. in /home/grml or /tmp).
+EOT
+
 }
 
 
@@ -284,9 +291,10 @@ function actionFormat
         die "could not initialise the first 2MB of $TARGET_ with /dev/urandom"
     elif [[ $OVERWRITE_SOURCE_DEV_ != '/dev/zero' ]]; then
       # default mode
-      echo "SECURE mode (taking /dev/urandom as source, this could take some time)"
-      execute "dd if=/dev/urandom of=$TARGET_ bs=1M &>/dev/null" ||\
-        die "could not initialise $TARGET_ with /dev/zero"
+      echo "SECURE mode (taking $OVERWRITE_SOURCE_DEV_ as source, this could take some time)"
+      execute "dd if=$OVERWRITE_SOURCE_DEV_ of=$TARGET_ bs=1M &>/dev/null" #||\
+        # skipped because "no space left on device" from dd
+        # die "could not initialise $TARGET_ with $OVERWRITE_SOURCE_DEV_"
     else
       echo 'INSECURE mode (only initialising the fist 2MB with /dev/urandom)'
       execute "dd if=/dev/urandom of=$TARGET_ bs=1M count=2 &>/dev/null" \
@@ -303,15 +311,18 @@ function actionFormat
     local mount_point_exists_='true'
     test -d "$MOUNT_POINT_" || mount_point_exists_='false'
 
-    if [[ "$MOUNT_POINT_" != "" && "$mount_point_exists_" == 'true' ]]; then
+    if [[ $MOUNT_POINT_ != "" && "$mount_point_exists_" == 'true' ]]; then
       $READONLY_SET_ && margs_='-r'
       execute "mount $margs_ $ADDITIONAL_MOUNT_ARGS_ $DM_PATH_ $MOUNT_POINT_" die
     else
-      $mount_point_exists_ || warn "mountpoint $MOUNT_POINT_ does not exist, not mounting. please use \"grml-crypt start $ORIG_TARGET_ <mountpoint>\" to start the device"
+      if [[ $MOUNT_POINT_ != "" ]]; then
+        $mount_point_exists_ || warn "mountpoint $MOUNT_POINT_ does not exist, not mounting. please use \"grml-crypt start $ORIG_TARGET_ <mountpoint>\" to start the device"
+      fi
       execute "$CRYPTSETUP_ luksClose $DM_NAME_" warn
       $IS_IMAGE_ && execute "losetup -d $TARGET_" warn
     fi
   else
+    execute "$CRYPTSETUP_ luksClose $DM_NAME_" warn
     $IS_IMAGE_ && execute "losetup -d $TARGET_" warn
   fi
 }
@@ -393,4 +404,4 @@ esac
 
 # END OF FILE
 ################################################################################
-# vim:foldmethod=marker
+# vim:foldmethod=marker tabstop=2 expandtab shiftwidth=2
