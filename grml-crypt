@@ -91,6 +91,7 @@ EOT
 NOTICE:
    losetup does _NOT_ work on unionfs => grml-crypt with a filesystem image does ONLY
    work if the image is on a tmpfs (eg. in /home/grml or /tmp).
+
 EOT
 
 }
