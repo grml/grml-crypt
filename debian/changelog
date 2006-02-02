@@ -1,3 +1,9 @@
+grml-crypt (0.13) unstable; urgency=low
+
+  * converted manpage to asciidoc 
+
+ -- Michael Gebetsroither <michael.geb@gmx.at>  Thu,  2 Feb 2006 16:58:00 +0100
+
 grml-crypt (0.12) unstable; urgency=low
 
   * varous small fixes 
