@@ -15,6 +15,7 @@ man8 = $(usr)/share/man/man8/
 
 %.gz : %.txt ;
 	asciidoc -d manpage -b docbook $^
+	sed -i 's/<emphasis role="strong">/<emphasis role="bold">/' `echo $^ |sed -e 's/.txt/.xml/'`
 	xsltproc /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl `echo $^ |sed -e 's/.txt/.xml/'`
 	gzip -f --best `echo $^ |sed -e 's/.txt//'`
 
