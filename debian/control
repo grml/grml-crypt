@@ -1,5 +1,5 @@
 Source: grml-crypt
-Section: admin
+Section: grml
 Priority: optional
 Maintainer: Michael Gebetsroither <gebi@grml.org>
 Build-Depends: debhelper (>= 4.0.0)

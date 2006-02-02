@@ -5,8 +5,8 @@ etc = ${DESTDIR}/etc/
 usr = ${DESTDIR}/usr
 usrbin = $(usr)/bin
 usrsbin = $(usr)/sbin
-usrshare = $(usr)/share/$(name)
-usrdoc = $(usr)/share/doc/$(name)
+usrshare = $(usr)/share/$(name_)
+usrdoc = $(usr)/share/doc/$(name_)
 man8 = $(usr)/share/man/man8/
 
 
