@@ -83,7 +83,7 @@ Show what is going on (more v => more out).
     itself (eg. xfs needs a minimum of 4096 blocks).
 
 *-m*::
-    Additional arguments passed through to mount. Could be like '-o noatime'.
+    Additional arguments passed through to mount. Could be like "'-o noatime'".
 
 
 CRYPTSETUP FORMAT OPTIONS
