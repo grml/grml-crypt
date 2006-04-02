@@ -26,11 +26,11 @@ ACTIONS
 *format <device/file> [mountpoint]*::
     This command "formats" a device/file. If the second parameter is not a
     blockdevice grml-crypt assumes that it should operate in file modus. If the
-    file does not allready exist it will be created with the given size. The
+    file does not already exist it will be created with the given size. The
     first 2MB of a device (luks header) are initialised with /dev/urandom, the
     other space is initialised with the given initialisation. If grml-crypt is
     in file modus the first 2MB of the loop file are also initialised with
-    /dev/urandom except where the file allready exist (with -f vor
+    /dev/urandom except where the file already exist (with -f vor
     overwriting). Commands: [losetup], dd, cryptsetup luksFormat, cryptsetup
     luksOpen, [dd], mkfs, [mount]
 
@@ -110,7 +110,7 @@ INITIALISATION MODES
 
 *Default/Secure mode (no -o or -z given)*::
     This mode is the default. It should be quite secure. The device/file gets
-    initialised with /dev/urandom. Except with an allready existing file and
+    initialised with /dev/urandom. Except with an already existing file and
     -f, where NO initialisation will be done (all other modes behave as usual).
 
 *Optimized secure mode (-o)*::

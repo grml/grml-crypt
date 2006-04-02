@@ -252,7 +252,7 @@ function actionFormat
     notice "Operating on a file"
     IS_IMAGE_='true'
     if [ -e "$TARGET_" ]; then
-      $FORCE_ || die "file $TARGET_ does allready exist"
+      $FORCE_ || die "$TARGET_ does already exist"
       warn "overwriting file $TARGET_"
       init_='donothing'
     else
