@@ -55,7 +55,7 @@ function printUsage
   cat <<EOT
 Usage: "$PROG_NAME__" [OPTIONS] action <device/file> [mountpoint]
 
-$PROG_NAME__ is a wrapper arround cryptsetup with LUKS support to format a device
+$PROG_NAME__ is a wrapper around cryptsetup with LUKS support to format a device
 
 OPTIONS:
    -s         size of the loop-filesystem to create, in MB (default=$SIZE_)

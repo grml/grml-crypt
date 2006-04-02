@@ -8,7 +8,7 @@ Standards-Version: 3.6.1
 Package: grml-crypt
 Architecture: all
 Depends: grml-shlib (>=1.02.07), cryptsetup-luks | cryptsetup (>=1.0.1-16), realpath, dmsetup
-Description: wrapper arround cryptsetup-luks
+Description: wrapper around cryptsetup-luks
  This software should provide an easy wrapper around cryptsetup-luks,
  losetup and mount.
  You could create and mount a encrypted filesystem image with only

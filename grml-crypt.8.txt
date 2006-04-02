@@ -5,18 +5,18 @@ Michael Gebetsroither <michael.geb@gmx.at>
 
 NAME
 ----
-grml-crypt - Wrapper arround cryptsetup/losetup/mkfs/mount
+grml-crypt - Wrapper around cryptsetup/losetup/mkfs/mount
 
 
 SYNOPSIS
 --------
-*grml-vpn* [OPTIONS] 'action' <device/file> '[mountpoint]'
+*grml-crypt* [OPTIONS] 'action' <device/file> '[mountpoint]'
 
 
 DESCRIPTION
 -----------
 *grml-crypt* is a program that
-provides an easy wrapper arround cryptsetup, mkfs, losetup and mount. You
+provides an easy wrapper around cryptsetup, mkfs, losetup and mount. You
 could create a loopback mountet crypted filesystem with only one command, but
 grml-crypt works for normal devices also.
 
@@ -25,7 +25,7 @@ ACTIONS
 -------
 *format <device/file> [mountpoint]*::
     This command "formats" a device/file. If the second parameter is not a
-    blockdevice grml-crupt assumes that it should operate in file modus. If the
+    blockdevice grml-crypt assumes that it should operate in file modus. If the
     file does not allready exist it will be created with the given size. The
     first 2MB of a device (luks header) are initialised with /dev/urandom, the
     other space is initialised with the given initialisation. If grml-crypt is
