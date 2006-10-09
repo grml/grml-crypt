@@ -42,5 +42,7 @@ install: all
 	$(install_) -m 755 $(name_) $(usrsbin)
 
 clean:
-	rm -rf $(name_).8.html $(name_).8.xml $(name_).8 $(name_).8.gz
+	rm -rf $(name_).8.xml $(name_).8
 
+cleanall: clean
+	rm -rf $(name_).8.html $(name_).8.gz
