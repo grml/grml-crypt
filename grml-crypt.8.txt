@@ -17,7 +17,7 @@ DESCRIPTION
 -----------
 *grml-crypt* is a program that
 provides an easy wrapper around cryptsetup, mkfs, losetup and mount. You
-could create a loopback mountet crypted filesystem with only one command, but
+could create a loopback mounted crypted filesystem with only one command, but
 grml-crypt works for normal devices also.
 
 
@@ -35,11 +35,11 @@ ACTIONS
     luksOpen, [dd], mkfs, [mount]
 
 *start <device/file> <mountpoint>*::
-    This command starts a encrypted device/file and mounts it to the given
+    This command starts an encrypted device/file and mounts it to the given
     mountpoint. Commands: [losetup], cryptsetup luksOpen, mount
 
 *stop <mountpoint>*::
-    This command stops a encrypted filesystem mountet at mountpoint. Even the
+    This command stops an encrypted filesystem mounted at mountpoint. Even the
     loopdevice gets destroyed with this command. Commands: mount, dmsetup info,
     cryptsetup status, umount, cryptsetup luksClose, [losetup -d]
 
