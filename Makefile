@@ -44,5 +44,5 @@ install: all
 clean:
 	rm -rf $(name_).8.xml $(name_).8
 
-cleanall: clean
+distclean: clean
 	rm -rf $(name_).8.html $(name_).8.gz
