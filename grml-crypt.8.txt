@@ -166,7 +166,7 @@ ENCRYPTED LOOPFILESYSTEM ON USBSTICK
 *mount /mnt/external1*::
     To mount your usb-stick on /mnt/external1 (please verify!!).
 
-*grml-crypt -o -t vfat -s 50 /mnt/external1/secure.img /mnt/tmp*::
+*grml-crypt -o -t vfat -s 50 format /mnt/external1/secure.img /mnt/tmp*::
     This command creates a 50MB big file, encrypted with the default options
     and with vfat (also known as fat32). The optimized initialisation mode will
     be used for this file (without -o this could take REALLY LONG).  This
