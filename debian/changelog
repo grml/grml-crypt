@@ -1,9 +1,9 @@
 grml-crypt (0.15) unstable; urgency=low
 
   * Added compiled doku to the .tar.gz package
-  * Manpage fix (thx rob.s) 
+  * Manpage fix (thx rob.s) [Closes: issue132]
 
- -- Michael Gebetsroither <gebi@grml.org>  Fri, 23 Feb 2007 10:56:28 +0100
+ -- Michael Gebetsroither <gebi@grml.org>  Fri, 23 Feb 2007 11:36:18 +0100
 
 grml-crypt (0.14) unstable; urgency=low
 
