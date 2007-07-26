@@ -4,7 +4,7 @@
 # Authors:       Michael Gebetsroither <gebi@grml.org>
 # Bug-Reports:   see http://grml.org/bugs/
 # License:       This file is licensed under the GPL v2.
-# Latest change: Mon Aug 08 11:37:20 CEST 2005
+# Latest change: Don Jul 26 19:57:28 CEST 2007 [mika]
 ################################################################################
 
 
@@ -62,7 +62,7 @@ OPTIONS:
    -t         type of filesystem (default=$FSTYPE_)
    -r         read only mode (fully supported only by start)
    -z         insecure mode, using /dev/zero for most of the initialisation (INSECURE!)
-   -o         optimized initialisation mode (should be as secure as the default but faster)
+   -o         optimised initialisation mode (should be as secure as the default but faster)
    -y         verifies the passphrase by asking for it twice
    -f         force file overwriting in format mode and/or disable confirmation dialog
    -m         additional arguments to mount
@@ -100,7 +100,7 @@ EOT
 function getDMName
 {
   device_="${1##*/}"
-  
+
   # first trying normal devicename
   tmp_="${DM_PREFIX_}${device_}"
   if [ ! -e "$tmp_" ]; then
@@ -131,10 +131,10 @@ function formatDevice
   execute "$CRYPTSETUP_ luksOpen $TARGET_ $DM_NAME_" warn \
     "could not open $DM_PATH_ to create a filesystem on it!" || return 1
   if [[ $type_ == 'init' && $OPTIMIZED_MODE_SET_ == 'true' ]]; then
-    echo "finishing optimized initialisation (this could take some time)"
+    echo "finishing optimised initialisation (this could take some time)"
     # FIXME
     execute "dd if=/dev/zero of=$DM_PATH_ bs=1M &>/dev/null" # || \
-    #  warn "could not finish optimized initialisation properly"
+    #  warn "could not finish optimised initialisation properly"
     ret_=$?
     # cutted out because of no space left on device error :(
     #if [[ $ret_ != 0 ]]; then
@@ -152,13 +152,13 @@ function formatDevice
     echo "Successully created $FSTYPE_ on encrypted $TARGET_"
     return 0
   fi
-} 
+}
 
 
 function actionStart
 {
   ret_=0
-  
+
   # no mountpoint, by-by
   if [[ "$MOUNT_POINT_" == "" ]]; then
     printUsage
@@ -198,12 +198,12 @@ function actionStop
   isExistent "$mp_" die
   tmp_=`realpath $mp_` || die "could not get realpath of $mp_"
   dprint "realpath_=\"$tmp_\""
-  
+
   dm_path_=`mount |grep "$tmp_ "` || die "$tmp_ is not mounted"
   dprint "dm_path_=\"$dm_path_\""
   dm_path_=`echo $dm_path_ |awk '{print $1}'` || die "could not get devicemapper name for $tmp_"
   dprint "dm_path_=\"$dm_path_\""
-  
+
   dm_name_="${dm_path_##*/}"
   dprint "dm_name_=\"$dm_name_\""
 
@@ -211,7 +211,7 @@ function actionStop
   device_=`$CRYPTSETUP_ status $dm_name_ |awk '/device:/{print $2}'` || \
     die "could not get underlying device of $dm_path_"
   dprint "device_=\"$device_\""
-  
+
   execute "umount $dm_path_" die "could not unmount $device_"
   execute "$CRYPTSETUP_ luksClose $dm_name_" die "could not close $dm_path_"
   echo "$device_" |grep loop &>/dev/null && execute "losetup -d $device_" \
@@ -224,7 +224,7 @@ this device could possible not be a loop device => maybe bogus error"
 function yesDialog
 {
   msg_="$1"
-  
+
   echo "WARNING!" >&2
   echo "========" >&2
   echo -n "$msg_" >&2
@@ -258,7 +258,7 @@ function actionFormat
     else
       echo -n "Initialising file with "
       if [[ $OPTIMIZED_MODE_SET_ == 'true' ]]; then
-        echo "optimized SECURE mode"
+        echo "optimised SECURE mode"
         execute "dd if=/dev/zero of=$TARGET_ bs=1M count=${SIZE_} &>/dev/null" \
           die "could not initialise $TARGET_ with /dev/zero"
       else

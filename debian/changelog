@@ -1,3 +1,10 @@
+grml-crypt (0.16) unstable; urgency=low
+
+  * Replace optimize* with optimise*, thanks for the hint
+    Thorsten Glaser. 
+
+ -- Michael Prokop <mika@grml.org>  Thu, 26 Jul 2007 19:57:32 +0200
+
 grml-crypt (0.15) unstable; urgency=low
 
   * Added compiled doku to the .tar.gz package
