@@ -1,3 +1,10 @@
+grml-crypt (0.17) unstable; urgency=low
+
+  * Several typo fixes and documentation improvements, thanks
+    for the patches - Alexander 'z3ttacht' Steinböck!
+
+ -- Michael Prokop <mika@grml.org>  Fri, 28 Sep 2007 00:04:33 +0200
+
 grml-crypt (0.16) unstable; urgency=low
 
   * Replace optimize* with optimise*, thanks for the hint
