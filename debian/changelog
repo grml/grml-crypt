@@ -4,7 +4,7 @@ grml-crypt (0.16) UNRELEASED; urgency=low
     Thorsten Glaser.
   * Several typo fixes and documentation improvements, thanks
     for the patches - Alexander 'z3ttacht' Steinböck!
-  * changed to /bin/bash 
+  * changed to /bin/bash [Closed: issue180]
 
  -- Michael Gebetsroither <gebi@grml.org>  Wed, 13 Feb 2008 13:35:29 +0100
 
