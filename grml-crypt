@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Filename:      grml-crypt
 # Purpose:       Program to format, mount and unmount encrypted devices/files
 # Authors:       Michael Gebetsroither <gebi@grml.org>

@@ -1,16 +1,12 @@
-grml-crypt (0.17) unstable; urgency=low
-
-  * Several typo fixes and documentation improvements, thanks
-    for the patches - Alexander 'z3ttacht' Steinböck!
-
- -- Michael Prokop <mika@grml.org>  Fri, 28 Sep 2007 00:04:33 +0200
-
-grml-crypt (0.16) unstable; urgency=low
+grml-crypt (0.16) UNRELEASED; urgency=low
 
   * Replace optimize* with optimise*, thanks for the hint
-    Thorsten Glaser. 
+    Thorsten Glaser.
+  * Several typo fixes and documentation improvements, thanks
+    for the patches - Alexander 'z3ttacht' Steinböck!
+  * changed to /bin/bash 
 
- -- Michael Prokop <mika@grml.org>  Thu, 26 Jul 2007 19:57:32 +0200
+ -- Michael Gebetsroither <gebi@grml.org>  Wed, 13 Feb 2008 13:35:29 +0100
 
 grml-crypt (0.15) unstable; urgency=low
 
