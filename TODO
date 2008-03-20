@@ -1,0 +1,1 @@
+ - add optimized ext3 fs profile for crypto (deactivated journal, activated dir_index and filetype)
