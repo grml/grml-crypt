@@ -1,3 +1,9 @@
+grml-crypt (0.17) UNRELEASED; urgency=low
+
+  * Made packet lintian clean. 
+
+ -- Michael Gebetsroither <gebi@grml.org>  Tue, 29 Apr 2008 00:51:38 +0200
+
 grml-crypt (0.16) unstable; urgency=low
 
   * Replace optimize* with optimise*, thanks for the hint
