@@ -1,12 +1,13 @@
-grml-crypt (0.16) UNRELEASED; urgency=low
+grml-crypt (0.16) unstable; urgency=low
 
   * Replace optimize* with optimise*, thanks for the hint
     Thorsten Glaser.
   * Several typo fixes and documentation improvements, thanks
     for the patches - Alexander 'z3ttacht' Steinböck!
+  * Applied patch-bomb by Frank Terbeck (ft).
   * changed to /bin/bash [Closed: issue180]
 
- -- Michael Gebetsroither <gebi@grml.org>  Wed, 13 Feb 2008 13:35:29 +0100
+ -- Michael Gebetsroither <gebi@grml.org>  Tue, 29 Apr 2008 00:34:06 +0200
 
 grml-crypt (0.15) unstable; urgency=low
 
