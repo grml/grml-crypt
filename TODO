@@ -1,1 +1,25 @@
+ - better cipher choosing (xts,essiv,plain)
+ - rename?
  - add optimized ext3 fs profile for crypto (deactivated journal, activated dir_index and filetype)
+
+Cleanup:
+hook_pre_initialize_=""
+    in: src <= /dev/{zero,urandom,random}
+    in: dev <= e.g /dev/loop2
+    task: overwrite first and last 2MB with RNDSRC
+hook_initialize_=""
+    in: dev <= e.g /dev/hda2, /dev/mapper/grml-crypt_hda2, ...
+
+profiles:
+secure
+    pre_init =
+    init     = all with RNDSRC (rnd)
+optimized
+    pre_init = first and last 2MB with RNDSRC (prnd)
+    init     = luksFormat with random pw and overwrite with /dev/zero (crnd)
+fast
+    pre_init = first and last 2MB with RNDSRC (prnd)
+    init     =
+custom
+    pre_init =
+    init     =
