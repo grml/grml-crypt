@@ -35,7 +35,7 @@ DM_PATH_=""
 ACTION_=""
 DM_PREFIX_="grml-crypt_"
 FORCE_='false'
-OVERWRITE_SOURCE_DEV_='/dev/urandom'
+ENTROPY_SOURCE_='/dev/urandom'
 OPTIMIZED_MODE_SET_='false'
 OPTIMIZING_LEVEL_=0
 CIPHER_SIZE_="256"
@@ -262,13 +262,13 @@ function actionFormat
         execute "dd if=/dev/zero of=$TARGET_ bs=1M count=${SIZE_} &>/dev/null" \
           die "could not initialise $TARGET_ with /dev/zero"
       else
-        if [[ $OVERWRITE_SOURCE_DEV_ == '/dev/zero' ]]; then
+        if [[ $ENTROPY_SOURCE_ == '/dev/zero' ]]; then
           echo "INSERCURE mode"
         else
           echo "SECURE mode (taking /dev/urandom as source, this could take some time)"
         fi
-        execute "dd if=$OVERWRITE_SOURCE_DEV_ of=$TARGET_ bs=1M count=${SIZE_} &>/dev/null" ||\
-          die "could not initialise $TARGET_ with $OVERWRITE_SOURCE_DEV_"
+        execute "dd if=$ENTROPY_SOURCE_ of=$TARGET_ bs=1M count=${SIZE_} &>/dev/null" ||\
+          die "could not initialise $TARGET_ with $ENTROPY_SOURCE_"
       fi
     fi
 
@@ -276,7 +276,7 @@ function actionFormat
 
     # TARGET_ is now /dev/loop<x>
     execute "losetup $TARGET_ $ORIG_TARGET_" die
-    if [[ $OPTIMIZED_MODE_SET_ == 'true' || $OVERWRITE_SOURCE_DEV_ == '/dev/zero' ]]; then
+    if [[ $OPTIMIZED_MODE_SET_ == 'true' || $ENTROPY_SOURCE_ == '/dev/zero' ]]; then
       execute "dd if=/dev/urandom of=$TARGET_ bs=1M count=2 &>/dev/null" \
       die "could not initialise the fist 2MB of $TARGET_ with /dev/urandom"
     fi
@@ -290,12 +290,12 @@ function actionFormat
       echo "optimised SECURE mode"
       execute "dd if=/dev/urandom of=$TARGET_ bs=1M count=2 &>/dev/null" ||\
         die "could not initialise the first 2MB of $TARGET_ with /dev/urandom"
-    elif [[ $OVERWRITE_SOURCE_DEV_ != '/dev/zero' ]]; then
+    elif [[ $ENTROPY_SOURCE_ != '/dev/zero' ]]; then
       # default mode
-      echo "SECURE mode (taking $OVERWRITE_SOURCE_DEV_ as source, this could take some time)"
-      execute "dd if=$OVERWRITE_SOURCE_DEV_ of=$TARGET_ bs=1M &>/dev/null" #||\
+      echo "SECURE mode (taking $ENTROPY_SOURCE_ as source, this could take some time)"
+      execute "dd if=$ENTROPY_SOURCE_ of=$TARGET_ bs=1M &>/dev/null" #||\
         # skipped because "no space left on device" from dd
-        # die "could not initialise $TARGET_ with $OVERWRITE_SOURCE_DEV_"
+        # die "could not initialise $TARGET_ with $ENTROPY_SOURCE_"
     else
       echo 'INSECURE mode (only initialising the fist 2MB with /dev/urandom)'
       execute "dd if=/dev/urandom of=$TARGET_ bs=1M count=2 &>/dev/null" \
@@ -340,7 +340,7 @@ while getopts "s:t:rzoyfm:hvS:C:I:A:" opt; do
     t) FSTYPE_="$OPTARG" ;;
     r) READONLY_SET_='true' ;;
     z) let OPTIMIZING_LEVEL_=$OPTIMIZING_LEVEL_+1
-        OVERWRITE_SOURCE_DEV_='/dev/zero'
+        ENTROPY_SOURCE_='/dev/zero'
         warn 'initialising from INSECURE source /dev/zero' ;;
     o) let OPTIMIZING_LEVEL_=$OPTIMIZING_LEVEL_+1
         OPTIMIZED_MODE_SET_='true' ;;
