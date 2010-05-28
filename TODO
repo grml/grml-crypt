@@ -1,7 +1,6 @@
  - better cipher choosing (xts,essiv,plain)
  - rename?
  - add optimized ext3 fs profile for crypto (deactivated journal, activated dir_index and filetype)
- - add --fsck for start (execute "sleep 3 && fsck -C $DM_PATH_" || die "fsck failed on $DM_PATH_") (request thokoeh)
 
 Cleanup:
 hook_pre_initialize_=""

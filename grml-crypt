@@ -35,6 +35,7 @@ DM_PATH_=""
 ACTION_=""
 DM_PREFIX_="grml-crypt_"
 FORCE_='false'
+FSCK_='false'
 ENTROPY_SOURCE_='/dev/urandom'
 OPTIMIZED_MODE_SET_='false'
 OPTIMIZING_LEVEL_=0
@@ -65,6 +66,7 @@ OPTIONS:
    -o         optimised initialisation mode (should be as secure as the default but faster)
    -y         verifies the passphrase by asking for it twice
    -f         force file overwriting in format mode and/or disable confirmation dialog
+   -F         only for action start: run fsck before mounting the filesystem
    -m         additional arguments to mount
    -v         verbose (show what is going on, v++)
    -h         this help text
@@ -184,6 +186,9 @@ function actionStart
   $READONLY_SET_ && cargs_='--readonly'
   execute "$CRYPTSETUP_ $cargs_ luksOpen $TARGET_ $DM_NAME_" warn || execute "losetup -d $TARGET_" || \
     die "could not luksOpen $TARGET_"
+  if [[ "$FSCK_" == "true" ]] ; then
+    execute "fsck -C $DM_NAME_" || die "fsck failed on $DM_NAME_"
+  fi
   margs_=""
   $READONLY_SET_ && margs_='-r'
   execute "mount $margs_ $ADDITIONAL_MOUNT_ARGS_ $DM_PATH_ $MOUNT_POINT_" die
@@ -334,7 +339,7 @@ function actionFormat
 ### __MAIN
 ###
 
-while getopts "s:t:rzoyfm:hvS:C:I:A:" opt; do
+while getopts "s:t:rzoyfFm:hvS:C:I:A:" opt; do
   case "$opt" in
     s) SIZE_="$OPTARG"; SIZE_SET_='true' ;;
     t) FSTYPE_="$OPTARG" ;;
@@ -346,6 +351,7 @@ while getopts "s:t:rzoyfm:hvS:C:I:A:" opt; do
         OPTIMIZED_MODE_SET_='true' ;;
     y) VERIFY_PW_="--verify-passphrase" ;;
     f) FORCE_='true' ;;
+    F) FSCK_='true' ;;
     m) ADDITIONAL_MOUNT_ARGS_="$OPTARG" ;;
     h) printUsage; exit ;;
     v) let verbose_=$verbose_+1 ;;

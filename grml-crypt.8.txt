@@ -80,6 +80,10 @@ Shows what is going on (more v => more out).
     be bigger than 2MB for LUKS only + the constraints from the filesystems
     itself (eg. xfs needs a minimum of 4096 blocks).
 
+*-F*::
+    Only for action start: Run fsck on the filesystem before mounting it to
+    the given mountpoint.
+
 *-m*::
     Additional arguments passed through to mount. Could be like "'-o noatime'".
 
