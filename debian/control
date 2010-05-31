@@ -10,7 +10,7 @@ Vcs-Browser: http://git.grml.org/?p=grml-crypt.git
 
 Package: grml-crypt
 Architecture: all
-Depends: grml-shlib (>=1.02.07), cryptsetup-luks | cryptsetup (>=1.0.1-16), realpath, dmsetup
+Depends: ${misc:Depends}, grml-shlib (>=1.02.07), cryptsetup-luks | cryptsetup (>=1.0.1-16), realpath, dmsetup
 Description: wrapper around cryptsetup-luks
  This software should provide an easy wrapper around cryptsetup-luks,
  losetup and mount.
