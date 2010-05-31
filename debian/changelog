@@ -1,6 +1,28 @@
+grml-crypt (0.18) unstable; urgency=low
+
+  [ Michael Gebetsroither ]
+  * Enhance default iteration time to 1000ms.
+  * Enhance default cipher size to 256bit.
+  * Add cleanup ideas to TODO.
+  * Fixed variable naming.
+
+  [ Thomas Koehler ]
+  * Added -F option to run fsck before mounting a filesystem.
+
+  [ Michael Prokop ]
+  * Debian packaging:
+    - Bump Standards-Version to 3.8.4.
+    - Update Vcs headers.
+    - Cleanup debian/rules.
+    - Bump debian compat level to 5.
+    - Add ${misc:Depends} to Depends.
+    - Build-Depend on debhelper >= 5.
+
+ -- Michael Prokop <mika@grml.org>  Mon, 31 May 2010 10:14:20 +0200
+
 grml-crypt (0.17) unstable; urgency=low
 
-  * Made packet lintian clean. 
+  * Made packet lintian clean.
 
  -- Michael Gebetsroither <gebi@grml.org>  Tue, 29 Apr 2008 00:59:14 +0200
 
@@ -24,20 +46,20 @@ grml-crypt (0.15) unstable; urgency=low
 
 grml-crypt (0.14) unstable; urgency=low
 
-  * Fixed a few typos (thanks to Zugschlus) 
+  * Fixed a few typos (thanks to Zugschlus)
 
  -- Michael Gebetsroither <michael.geb@gmx.at>  Sun,  2 Apr 2006 20:02:32 +0200
 
 grml-crypt (0.13) unstable; urgency=low
 
   * converted manpage to asciidoc
-  * few small fixes 
+  * few small fixes
 
  -- Michael Gebetsroither <michael.geb@gmx.at>  Thu,  2 Feb 2006 17:07:36 +0100
 
 grml-crypt (0.12) unstable; urgency=low
 
-  * varous small fixes 
+  * varous small fixes
 
  -- Michael Gebetsroither <michael.geb@gmx.at>  Wed, 18 Jan 2006 00:59:11 +0100
 
@@ -56,7 +78,7 @@ grml-crypt (0.10) unstable; urgency=low
 
 grml-crypt (0.09) unstable; urgency=low
 
-  * added usage example for usb-stick encryption to manpage 
+  * added usage example for usb-stick encryption to manpage
 
  -- Michael Gebetsroither <michael.geb@gmx.at>  Sat, 22 Oct 2005 03:05:58 +0200
 
@@ -76,7 +98,7 @@ grml-crypt (0.07) unstable; urgency=low
 
 grml-crypt (0.06) unstable; urgency=low
 
-  * fixed yesDialog with file which does not exist 
+  * fixed yesDialog with file which does not exist
 
  -- Michael Gebetsroither <michael.geb@gmx.at>  Mon, 15 Aug 2005 23:40:44 +0200
 
@@ -89,7 +111,7 @@ grml-crypt (0.05) unstable; urgency=low
 
 grml-crypt (0.04) unstable; urgency=low
 
-  * fixed a bug with filesystem images on unionfs 
+  * fixed a bug with filesystem images on unionfs
 
  -- Michael Gebetsroither <michael.geb@gmx.at>  Wed, 10 Aug 2005 12:19:36 +0200
 
@@ -107,7 +129,7 @@ grml-crypt (0.03) unstable; urgency=low
 
 grml-crypt (0.02) unstable; urgency=low
 
-  * small manpage fix 
+  * small manpage fix
   * removed function findNextFreeLoop, because it's now in sh-lib
   * removed a few testing functions
 
