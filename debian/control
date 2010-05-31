@@ -3,10 +3,10 @@ Section: grml
 Priority: optional
 Maintainer: Michael Gebetsroither <gebi@grml.org>
 Build-Depends: debhelper (>= 4.0.0), xsltproc, docbook-xsl, asciidoc
-Standards-Version: 3.7.3
-Homepage: http://hg.grml.org/grml-crypt/
-XS-Vcs-hg: http://hg.grml.org/grml-crypt/
-XS-Vcs-Browser: http://hg.grml.org/grml-crypt/
+Standards-Version: 3.8.4
+Homepage: http://git.grml.org/?p=grml-crypt.git
+Vcs-git: git://git.grml.org/grml-crypt.git
+Vcs-Browser: http://git.grml.org/?p=grml-crypt.git
 
 Package: grml-crypt
 Architecture: all
