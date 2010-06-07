@@ -66,7 +66,7 @@ OPTIONS:
    -o         optimised initialisation mode (should be as secure as the default but faster)
    -y         verifies the passphrase by asking for it twice
    -f         force file overwriting in format mode and/or disable confirmation dialog
-   -F         only for action start: run fsck before mounting the filesystem
+   -F         only for action start: run fsck before mounting the filesystem. Use fsck's -f option if given twice.
    -m         additional arguments to mount
    -v         verbose (show what is going on, v++)
    -h         this help text
@@ -188,6 +188,8 @@ function actionStart
     die "could not luksOpen $TARGET_"
   if [[ "$FSCK_" == "true" ]] ; then
     execute "fsck -C $DM_PATH_" || die "fsck failed on $DM_PATH_"
+  elif [[ "$FSCK_" == "trueforce" ]] ; then
+    execute "fsck -f -C $DM_PATH_" || die "fsck failed on $DM_PATH_"
   fi
   margs_=""
   $READONLY_SET_ && margs_='-r'
@@ -351,7 +353,12 @@ while getopts "s:t:rzoyfFm:hvS:C:I:A:" opt; do
         OPTIMIZED_MODE_SET_='true' ;;
     y) VERIFY_PW_="--verify-passphrase" ;;
     f) FORCE_='true' ;;
-    F) FSCK_='true' ;;
+    F) if [[ "$FSCK_" == "true" ]] ; then
+         FSCK_='trueforce'
+       else
+         FSCK_='true'
+       fi
+      ;;
     m) ADDITIONAL_MOUNT_ARGS_="$OPTARG" ;;
     h) printUsage; exit ;;
     v) let verbose_=$verbose_+1 ;;

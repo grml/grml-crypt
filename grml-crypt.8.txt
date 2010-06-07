@@ -82,7 +82,7 @@ Shows what is going on (more v => more out).
 
 *-F*::
     Only for action start: Run fsck on the filesystem before mounting it to
-    the given mountpoint.
+    the given mountpoint. If given twice, use fsck's -f option as well.
 
 *-m*::
     Additional arguments passed through to mount. Could be like "'-o noatime'".
