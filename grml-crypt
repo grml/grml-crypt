@@ -187,7 +187,7 @@ function actionStart
   execute "$CRYPTSETUP_ $cargs_ luksOpen $TARGET_ $DM_NAME_" warn || execute "losetup -d $TARGET_" || \
     die "could not luksOpen $TARGET_"
   if [[ "$FSCK_" == "true" ]] ; then
-    execute "fsck -C $DM_NAME_" || die "fsck failed on $DM_NAME_"
+    execute "fsck -C $DM_PATH_" || die "fsck failed on $DM_PATH_"
   fi
   margs_=""
   $READONLY_SET_ && margs_='-r'
