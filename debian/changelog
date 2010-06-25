@@ -1,3 +1,11 @@
+grml-crypt (0.19) unstable; urgency=low
+
+  [ Thomas Koehler ]
+  * Bugfix: use DM_PATH_ instead of DM_NAME_ for fsck.
+  * Feature: if -F is given twice, run fsck with -f.
+
+ -- Michael Prokop <mika@grml.org>  Fri, 25 Jun 2010 13:43:22 +0200
+
 grml-crypt (0.18) unstable; urgency=low
 
   [ Michael Gebetsroither ]
