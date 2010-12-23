@@ -214,7 +214,7 @@ function actionStop
   dm_name_="${dm_path_##*/}"
   dprint "dm_name_=\"$dm_name_\""
 
-  dmsetup info $dm_name_ >/dev/null ||die "$dm_name_ is not aktive"
+  dmsetup info $dm_name_ >/dev/null ||die "$dm_name_ is not active"
   device_=`$CRYPTSETUP_ status $dm_name_ |awk '/device:/{print $2}'` || \
     die "could not get underlying device of $dm_path_"
   dprint "device_=\"$device_\""
@@ -224,7 +224,7 @@ function actionStop
   echo "$device_" |grep loop &>/dev/null && execute "losetup -d $device_" \
     die "could not delete loop device $device_" || \
     execute "losetup -d $device_ &>/dev/null" eprint "could not delete loop device $device_, \
-this device could possible not be a loop device => maybe bogus error"
+this device possibly is not a loop device => maybe bogus error"
   notice "$mp_ successfully unmountet/closed/deleted"
 }
 
