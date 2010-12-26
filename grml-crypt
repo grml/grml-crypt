@@ -211,6 +211,19 @@ function actionStop
   dm_path_=`echo $dm_path_ |awk '{print $1}'` || die "could not get devicemapper name for $tmp_"
   dprint "dm_path_=\"$dm_path_\""
 
+  # check for symlinks
+  for dmapper in /dev/mapper/grml-crypt* ; do
+    link=$(readlink -f "$dmapper")
+    dprint "looping device mapper devices, dmapper=$dmapper => link=$link"
+    if [ "$link" = "$dm_path_" ] ; then
+      tmp_dm_path_="$dmapper"
+    fi
+  done
+
+  if [ -n "$tmp_dm_path_" ] ; then
+    dm_path_="$tmp_dm_path_"
+  fi
+
   dm_name_="${dm_path_##*/}"
   dprint "dm_name_=\"$dm_name_\""
 
