@@ -212,6 +212,7 @@ function actionStop
   dprint "dm_path_=\"$dm_path_\""
 
   # check for symlinks
+  unset tmp_dm_path_
   for dmapper in /dev/mapper/grml-crypt* ; do
     link=$(readlink -f "$dmapper")
     dprint "looping device mapper devices, dmapper=$dmapper => link=$link"
@@ -222,6 +223,7 @@ function actionStop
 
   if [ -n "$tmp_dm_path_" ] ; then
     dm_path_="$tmp_dm_path_"
+    unset tmp_dm_path_
   fi
 
   dm_name_="${dm_path_##*/}"
