@@ -1,3 +1,14 @@
+grml-crypt (0.20) unstable; urgency=low
+
+  [ Thomas Koehler ]
+  * [2807d32] Typo fixes in a few messages.
+
+  [ Michael Prokop ]
+  * [cb23919 + 6bdde23] Fix symlink problem with newer device mapper,
+    patch based on work by Thomas Koehler (thanks!).
+
+ -- Michael Prokop <mika@grml.org>  Sun, 26 Dec 2010 23:45:55 +0100
+
 grml-crypt (0.19) unstable; urgency=low
 
   [ Thomas Koehler ]
