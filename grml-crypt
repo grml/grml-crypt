@@ -46,6 +46,7 @@ ADDITIONAL_CRYPTSETUP_ARGS_=""
 READONLY_SET_='false'
 ADDITIONAL_MOUNT_ARGS_=""
 BATCH_MODE_="--batch-mode"
+PV_=/usr/bin/pv
 
 ###
 ### __FUNCTIONS
@@ -125,6 +126,10 @@ function formatDevice
 {
   type_="$1"  # could be donothing or init
   ret_=0
+  local ddcmd_="dd if=/dev/zero of=$DM_PATH_ bs=1M &>/dev/null"
+  if [[ -x "$PV_" && $verbose_ -ge 3 ]] ; then
+    ddcmd_="dd if=/dev/zero bs=1M 2>/dev/null | $PV_ | dd of=$DM_PATH_ bs=1M &>/dev/null"
+  fi
 
   args_="$VERIFY_PW_ $BATCH_MODE_ --key-size $CIPHER_SIZE_ --cipher $CIPHER_ --iter-time $ITERATION_TIME_ $ADDITIONAL_CRYPTSETUP_ARGS_"
   #args_=`echo "$args_" |tr -s ' '`
@@ -135,7 +140,7 @@ function formatDevice
   if [[ $type_ == 'init' && $OPTIMIZED_MODE_SET_ == 'true' ]]; then
     echo "finishing optimised initialisation (this could take some time)"
     # FIXME
-    execute "dd if=/dev/zero of=$DM_PATH_ bs=1M &>/dev/null" # || \
+    execute "$ddcmd_" # || \
     #  warn "could not finish optimised initialisation properly"
     ret_=$?
     # cutted out because of no space left on device error :(
@@ -264,6 +269,7 @@ function actionFormat
   IS_IMAGE_='false'
   ret_=0
   init_='init'
+  local ddcmd_
 
   if (( $SIZE_ < 3 )); then
     die "the minimum size of an encrypted luks partition should be 2"
@@ -315,7 +321,11 @@ function actionFormat
     elif [[ $ENTROPY_SOURCE_ != '/dev/zero' ]]; then
       # default mode
       echo "SECURE mode (taking $ENTROPY_SOURCE_ as source, this could take some time)"
-      execute "dd if=$ENTROPY_SOURCE_ of=$TARGET_ bs=1M &>/dev/null" #||\
+      ddcmd_="dd if=$ENTROPY_SOURCE_ of=$TARGET_ bs=1M &>/dev/null"
+      if [[ -x "$PV_" && $verbose_ -ge 3 ]] ; then
+        ddcmd_="dd if=$ENTROPY_SOURCE_ bs=1M 2>/dev/null | $PV_ | dd of=$TARGET_ bs=1M &>/dev/null"
+      fi
+      execute "$ddcmd_" #||\
         # skipped because "no space left on device" from dd
         # die "could not initialise $TARGET_ with $ENTROPY_SOURCE_"
     else
