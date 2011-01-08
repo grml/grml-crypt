@@ -2,6 +2,7 @@ Source: grml-crypt
 Section: grml
 Priority: optional
 Maintainer: Michael Gebetsroither <gebi@grml.org>
+Uploaders: Michael Prokop <mika@grml.org>
 Build-Depends: debhelper (>= 5), xsltproc, docbook-xsl, asciidoc
 Standards-Version: 3.9.1
 Homepage: http://git.grml.org/?p=grml-crypt.git
