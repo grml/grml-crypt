@@ -1,3 +1,16 @@
+grml-crypt (0.21) unstable; urgency=low
+
+  [ Thomas Koehler ]
+  * [2f50b4b] more verbosity with -vvv format When running grml-crypt -
+    vvv format, if pv is available, display progress via pv.
+
+  [ Michael Prokop ]
+  * [c1103c3] Minor formating fix.
+  * [ceede61] Bump Standards-Version to 3.9.1.
+  * [1d1adb1] Add myself as Uploader.
+
+ -- Michael Prokop <mika@grml.org>  Sat, 08 Jan 2011 15:07:01 +0100
+
 grml-crypt (0.20) unstable; urgency=low
 
   [ Thomas Koehler ]
