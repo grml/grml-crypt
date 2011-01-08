@@ -46,7 +46,7 @@ ADDITIONAL_CRYPTSETUP_ARGS_=""
 READONLY_SET_='false'
 ADDITIONAL_MOUNT_ARGS_=""
 BATCH_MODE_="--batch-mode"
-PV_=/usr/bin/pv
+PV_='/usr/bin/pv'
 
 ###
 ### __FUNCTIONS
@@ -325,7 +325,7 @@ function actionFormat
       if [[ -x "$PV_" && $verbose_ -ge 3 ]] ; then
         ddcmd_="dd if=$ENTROPY_SOURCE_ bs=1M 2>/dev/null | $PV_ | dd of=$TARGET_ bs=1M &>/dev/null"
       fi
-      execute "$ddcmd_" #||\
+      execute "$ddcmd_" # ||\
         # skipped because "no space left on device" from dd
         # die "could not initialise $TARGET_ with $ENTROPY_SOURCE_"
     else
