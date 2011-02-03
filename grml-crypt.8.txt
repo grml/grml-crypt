@@ -32,9 +32,9 @@ ACTIONS
     Commands: [losetup], dd, cryptsetup luksFormat, cryptsetup
     luksOpen, [dd], mkfs, [mount]
 
-*start <device/file> <mountpoint>*::
+*start <device/file> [mountpoint]*::
     Starts an encrypted <device/file> and mounts it to the given
-    mountpoint. Commands: [losetup], cryptsetup luksOpen, mount
+    or a default mountpoint. Commands: [losetup], cryptsetup luksOpen, mount
 
 *stop <mountpoint>*::
     Stops an encrypted filesystem mounted at <mountpoint>. Even the
