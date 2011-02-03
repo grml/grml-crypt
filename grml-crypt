@@ -83,8 +83,8 @@ ACTIONS:
               Format a device or a file (is created with the given size if it
               does not exist) with the given filesystem and mount it, if a
               mountpoint was given.
-   start  <device/file> <mountpoint>
-              Mount the device/file in the mountpoint.
+   start  <device/file> [mountpoint]
+              Mount the device/file in the mountpoint or to a default mountpoint.
    stop   <mountpoint>
               Umount the given mountpoint (umount, luksClose, losetup -d)
 
@@ -166,13 +166,13 @@ function actionStart
 {
   ret_=0
 
-  # no mountpoint, by-by
   if [[ "$MOUNT_POINT_" == "" ]]; then
-    printUsage
-    die 'no mountpoint given'
-  fi
-  if [ ! -d "$MOUNT_POINT_" ]; then
-    die "mountpoint $MOUNT_POINT_ does not exist"
+    MOUNT_POINT_="/mnt/$DM_NAME_"
+  else
+    # error out if mountpoint was given but doesn't exist
+    if [ ! -d "$MOUNT_POINT_" ]; then
+      die "mountpoint $MOUNT_POINT_ does not exist"
+    fi
   fi
   # removed due to unionfs problem isLuks does not work with filesystem images
   # without losetup
@@ -198,6 +198,10 @@ function actionStart
   fi
   margs_=""
   $READONLY_SET_ && margs_='-r'
+  # mountpoint was not given so we use the default one which we need to create first
+  if [ ! -d "$MOUNT_POINT_" ]; then
+    execute "mkdir -p '$MOUNT_POINT_'" || die "failed to create mountpoint $MOUNT_POINT_"
+  fi
   execute "mount $margs_ $ADDITIONAL_MOUNT_ARGS_ $DM_PATH_ $MOUNT_POINT_" die
 }
 
@@ -240,6 +244,9 @@ function actionStop
   dprint "device_=\"$device_\""
 
   execute "umount $dm_path_" die "could not unmount $device_"
+  if [[ "$MOUNT_POINT_" == "/mnt/$dm_name_" ]]; then
+    rmdir "$MOUNT_POINT_"
+  fi
   execute "$CRYPTSETUP_ luksClose $dm_name_" die "could not close $dm_path_"
   echo "$device_" |grep loop &>/dev/null && execute "losetup -d $device_" \
     die "could not delete loop device $device_" || \
