@@ -202,6 +202,7 @@ function actionStart
   if [ ! -d "$MOUNT_POINT_" ]; then
     execute "mkdir -p '$MOUNT_POINT_'" || die "failed to create mountpoint $MOUNT_POINT_"
   fi
+  udevadm settle
   execute "mount $margs_ $ADDITIONAL_MOUNT_ARGS_ $DM_PATH_ $MOUNT_POINT_" die
 }
 
