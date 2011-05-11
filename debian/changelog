@@ -1,3 +1,16 @@
+grml-crypt (0.22) unstable; urgency=low
+
+  [ Thomas Koehler ]
+  * [72dd60f] if no mountpoint was given to action start, create a
+    default one
+  * [fb8006b] bugfix: throw in a "udevadm settle" to avoid occasional
+    failing mount attempts
+
+  [ Christian Hofstaedtler ]
+  * [5e4a63f] Bump Standards-Version to 3.9.2 (no changes)
+
+ -- Christian Hofstaedtler <ch@grml.org>  Thu, 12 May 2011 00:15:41 +0200
+
 grml-crypt (0.21) unstable; urgency=low
 
   [ Thomas Koehler ]
