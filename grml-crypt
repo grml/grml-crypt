@@ -36,6 +36,7 @@ ACTION_=""
 DM_PREFIX_="grml-crypt_"
 FORCE_='false'
 FSCK_='false'
+FSCK_EXTRA_OPTS_=""
 ENTROPY_SOURCE_='/dev/urandom'
 OPTIMIZED_MODE_SET_='false'
 OPTIMIZING_LEVEL_=0
@@ -67,7 +68,10 @@ OPTIONS:
    -o         optimised initialisation mode (should be as secure as the default but faster)
    -y         verifies the passphrase by asking for it twice
    -f         force file overwriting in format mode and/or disable confirmation dialog
-   -F         only for action start: run fsck before mounting the filesystem. Use fsck's -f option if given twice.
+   -F         only for action start: run fsck before mounting the filesystem.
+              Use fsck's -f option if given twice.
+   -X         Read next argument as a list of options to pass to fsck:
+              'grml-crypt -FF -X "-y -T" start /dev/ice' will run fsck with options -y and -T.
    -m         additional arguments to mount
    -v         verbose (show what is going on, v++)
    -h         this help text
@@ -192,9 +196,9 @@ function actionStart
   execute "$CRYPTSETUP_ $cargs_ luksOpen $TARGET_ $DM_NAME_" warn || execute "losetup -d $TARGET_" || \
     die "could not luksOpen $TARGET_"
   if [[ "$FSCK_" == "true" ]] ; then
-    execute "fsck -C $DM_PATH_" || die "fsck failed on $DM_PATH_"
+    execute "fsck $FSCK_EXTRA_OPTS_ -C $DM_PATH_" || die "fsck failed on $DM_PATH_"
   elif [[ "$FSCK_" == "trueforce" ]] ; then
-    execute "fsck -f -C $DM_PATH_" || die "fsck failed on $DM_PATH_"
+    execute "fsck -f $FSCK_EXTRA_OPTS_ -C $DM_PATH_" || die "fsck failed on $DM_PATH_"
   fi
   margs_=""
   $READONLY_SET_ && margs_='-r'
@@ -374,7 +378,7 @@ function actionFormat
 ### __MAIN
 ###
 
-while getopts "s:t:rzoyfFm:hvS:C:I:A:" opt; do
+while getopts "s:t:rzoyfFm:hvS:C:I:A:X:" opt; do
   case "$opt" in
     s) SIZE_="$OPTARG"; SIZE_SET_='true' ;;
     t) FSTYPE_="$OPTARG" ;;
@@ -392,6 +396,7 @@ while getopts "s:t:rzoyfFm:hvS:C:I:A:" opt; do
          FSCK_='true'
        fi
       ;;
+    X) FSCK_EXTRA_OPTS_="$OPTARG" ;;
     m) ADDITIONAL_MOUNT_ARGS_="$OPTARG" ;;
     h) printUsage; exit ;;
     v) let verbose_=$verbose_+1 ;;
