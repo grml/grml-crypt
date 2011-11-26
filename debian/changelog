@@ -1,3 +1,13 @@
+grml-crypt (0.23) unstable; urgency=low
+
+  [ Christian Hofstaedtler ]
+  * [392bff4] Add debian/control headers Origin, Bugs
+
+  [ Thomas Koehler ]
+  * [fd57727] pass additional arguments to fsck when given via -X
+
+ -- Michael Prokop <mika@grml.org>  Sat, 26 Nov 2011 17:44:12 +0100
+
 grml-crypt (0.22) unstable; urgency=low
 
   [ Thomas Koehler ]
