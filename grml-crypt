@@ -171,7 +171,7 @@ function actionStart
   ret_=0
 
   if [[ "$MOUNT_POINT_" == "" ]]; then
-    MOUNT_POINT_="/mnt/$DM_NAME_"
+    MOUNT_POINT_="/media/$DM_NAME_"
   else
     # error out if mountpoint was given but doesn't exist
     if [ ! -d "$MOUNT_POINT_" ]; then
@@ -249,7 +249,7 @@ function actionStop
   dprint "device_=\"$device_\""
 
   execute "umount $dm_path_" die "could not unmount $device_"
-  if [[ "$MOUNT_POINT_" == "/mnt/$dm_name_" ]]; then
+  if [[ "$MOUNT_POINT_" == "/media/$dm_name_" ]]; then
     rmdir "$MOUNT_POINT_"
   fi
   execute "$CRYPTSETUP_ luksClose $dm_name_" die "could not close $dm_path_"

@@ -128,20 +128,20 @@ INITIALISATION MODES
 EXAMPLES
 --------
 
-*grml-crypt -t xfs -o format /dev/hda4 /mnt/tmp*::
+*grml-crypt -t xfs -o format /dev/hda4 /media/tmp*::
     Formats /dev/hda4 with xfs and applies optimized initialisation rules and
-    mounts it to /mnt/tmp
+    mounts it to /media/tmp
 
-*grml-crypt -t ext2 -z format /home/user/test.img /mnt/tmp*::
+*grml-crypt -t ext2 -z format /home/user/test.img /media/tmp*::
     Creates /home/user/test.img with 10MB and applies only insecure
     initialisation rules.  Creates an ext2 filesystem on it and mounts it to
-    /mnt/tmp.
+    /media/tmp.
 
-*grml-crypt -f -S 256 -C aes-plain -I 2 -A --verify-passphrase -m \'-o noatime\' -vvv format img /mnt/tmp*::
+*grml-crypt -f -S 256 -C aes-plain -I 2 -A --verify-passphrase -m \'-o noatime\' -vvv format img /media/tmp*::
     Reuses the image img with no initialisation. The encryption is established
     with aes-plain with 256 bit keysize and an iteration time of 2 seconds.
     Cryptsetup is advised to verify the password by asking for it twice. Mounts
-    it to /mnt/tmp with '-o noatime'. And prints what is going on (-vvv).
+    it to /media/tmp with '-o noatime'. And prints what is going on (-vvv).
 
 
 ENCRYPT AN USBSTICK
@@ -153,11 +153,11 @@ ENCRYPT AN USBSTICK
     could give the format action a mountpoint too. In this case your
     crypto-partition gets mounted on that mountpoint as well.
 
-*grml-crypt start /dev/external1 /mnt/tmp*::
+*grml-crypt start /dev/external1 /media/tmp*::
     Asks you for the right passphrase for your crypto-partition
-    and tries to mount it to /mnt/tmp.
+    and tries to mount it to /media/tmp.
 
-*grml-crypt stop /mnt/tmp*::
+*grml-crypt stop /media/tmp*::
     Removes your crypto-partition cleanly out of the system
     (umount, cryptsetup luksClose, [losetup -d]).
 
@@ -165,20 +165,20 @@ ENCRYPT AN USBSTICK
 ENCRYPTED LOOPFILESYSTEM ON USBSTICK
 ------------------------------------
 
-*mount /mnt/external1*::
-    Mounts your usb-stick on /mnt/external1 (please verify!).
+*mount /media/external1*::
+    Mounts your usb-stick on /media/external1 (please verify!).
 
-*grml-crypt -o -t vfat -s 50 format /mnt/external1/secure.img /mnt/tmp*::
+*grml-crypt -o -t vfat -s 50 format /media/external1/secure.img /media/tmp*::
     Creates a 50MB big file, encrypted with the default options
     and vfat (also known as fat32). The optimized initialisation mode will
     be used for this file (without -o this could take REALLY LONG).  This
-    command _also_ starts your cryptofile and mounts it on /mnt/tmp.
+    command _also_ starts your cryptofile and mounts it on /media/tmp.
 
-*grml-crypt stop /mnt/tmp*::
+*grml-crypt stop /media/tmp*::
     Removes your crypto-partition cleanly out of the system
     (umount, cryptsetup luksClose, [losetup -d]).
 
-*umount /mnt/external1*::
+*umount /media/external1*::
     Guess what? ;)
 
 
