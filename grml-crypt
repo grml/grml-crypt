@@ -427,8 +427,8 @@ if (( $OPTIMIZING_LEVEL_ > 1 )); then
 fi
 TARGET_="$2"
 
-MKFS_="/sbin/mkfs.$FSTYPE_"
-if [ ! -x "$MKFS_" ]; then
+MKFS_="`which mkfs.$FSTYPE_`"
+if [ $? != "0" ]; then
   die "invalid filesystem type \"$FSTYPE_\"" 1
 fi
 
