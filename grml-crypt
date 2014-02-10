@@ -4,7 +4,6 @@
 # Authors:       Michael Gebetsroither <gebi@grml.org>
 # Bug-Reports:   see http://grml.org/bugs/
 # License:       This file is licensed under the GPL v2.
-# Latest change: Don Jul 26 19:57:28 CEST 2007 [mika]
 ################################################################################
 
 
@@ -79,8 +78,8 @@ OPTIONS:
 CRYPTSETUP FORMAT OPTIONS:
    -S         cipher size, could be 128, 192 or 256 (default=$CIPHER_SIZE_)
    -C         cipher, should be aes-plain for pre-2.6.10 (default=$CIPHER_)
-   -I         iteration time spend with PBKDF2 password  processing in seconds (default=$ITERATION_TIME_)
-   -A         additional arguments for cryptsetup (only supportet by format)
+   -I         iteration time spent with PBKDF2 password processing in seconds (default=$ITERATION_TIME_)
+   -A         additional arguments for cryptsetup (only supported by format)
 
 ACTIONS:
    format  <device/file> [mountpoint]
@@ -160,7 +159,7 @@ function formatDevice
     warn "could not create filesystem on $DM_PATH_" 1
     return 1
   else
-    echo "Successully created $FSTYPE_ on encrypted $TARGET_"
+    echo "Successfully created $FSTYPE_ on encrypted $TARGET_"
     return 0
   fi
 }
@@ -257,7 +256,7 @@ function actionStop
     die "could not delete loop device $device_" || \
     execute "losetup -d $device_ &>/dev/null" eprint "could not delete loop device $device_, \
 this device possibly is not a loop device => maybe bogus error"
-  notice "$mp_ successfully unmountet/closed/deleted"
+  notice "$mp_ successfully unmounted/closed/deleted"
 }
 
 function yesDialog
@@ -303,7 +302,7 @@ function actionFormat
           die "could not initialise $TARGET_ with /dev/zero"
       else
         if [[ $ENTROPY_SOURCE_ == '/dev/zero' ]]; then
-          echo "INSERCURE mode"
+          echo "INSECURE mode"
         else
           echo "SECURE mode (taking /dev/urandom as source, this could take some time)"
         fi
@@ -323,7 +322,7 @@ function actionFormat
     formatDevice "$init_"
     ret_=$?
   else
-    $FORCE_ || (yesDialog "Are you shure you want to overwrite $TARGET_ ?" || die 'You are not sure')
+    $FORCE_ || (yesDialog "Are you sure you want to overwrite ${TARGET_}?" || die 'You are not sure')
     notice 'Operating on a device'
     echo -n 'Initialising device with '
     if [[ $OPTIMIZED_MODE_SET_ == 'true' ]]; then
@@ -361,7 +360,7 @@ function actionFormat
       execute "mount $margs_ $ADDITIONAL_MOUNT_ARGS_ $DM_PATH_ $MOUNT_POINT_" die
     else
       if [[ $MOUNT_POINT_ != "" ]]; then
-        $mount_point_exists_ || warn "mountpoint $MOUNT_POINT_ does not exist, not mounting. please use \"grml-crypt start $ORIG_TARGET_ <mountpoint>\" to start the device"
+        $mount_point_exists_ || warn "mountpoint $MOUNT_POINT_ does not exist, not mounting. Please use \"grml-crypt start $ORIG_TARGET_ <mountpoint>\" to start the device"
       fi
       execute "$CRYPTSETUP_ luksClose $DM_NAME_" warn
       $IS_IMAGE_ && execute "losetup -d $TARGET_" warn
@@ -423,7 +422,7 @@ if (( $# < 2 )); then
 fi
 if (( $OPTIMIZING_LEVEL_ > 1 )); then
   printUsage
-  die "please choose ONE initialisation methode"
+  die "please choose ONE initialisation method"
 fi
 TARGET_="$2"
 
