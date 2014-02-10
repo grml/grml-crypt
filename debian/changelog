@@ -1,3 +1,11 @@
+grml-crypt (0.26) unstable; urgency=medium
+
+  * [5347d32] Fix several typos
+  * [1f6866b] Bump Standards-Version to 3.9.5
+  * [bd6d1bf] Set myself as maintainer
+
+ -- Michael Prokop <mika@grml.org>  Mon, 10 Feb 2014 11:31:14 +0100
+
 grml-crypt (0.25) unstable; urgency=low
 
   [ Florian Klien ]
