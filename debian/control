@@ -2,7 +2,11 @@ Source: grml-crypt
 Section: grml
 Priority: optional
 Maintainer: Michael Prokop <mika@grml.org>
-Build-Depends: debhelper (>= 5), xsltproc, docbook-xsl, asciidoc
+Build-Depends:
+ asciidoc,
+ debhelper (>= 5),
+ docbook-xsl,
+ xsltproc,
 Standards-Version: 3.9.5
 Homepage: http://git.grml.org/?p=grml-crypt.git
 Vcs-git: git://git.grml.org/grml-crypt.git
@@ -12,7 +16,11 @@ Bugs: mailto:bugs@grml.org
 
 Package: grml-crypt
 Architecture: all
-Depends: ${misc:Depends}, grml-shlib (>=1.02.07), cryptsetup-luks | cryptsetup (>=1.0.1-16), dmsetup
+Depends:
+ cryptsetup-luks | cryptsetup (>=1.0.1-16),
+ dmsetup,
+ grml-shlib (>=1.02.07),
+ ${misc:Depends},
 Description: wrapper around cryptsetup-luks
  This software should provide an easy wrapper around cryptsetup-luks,
  losetup and mount.
