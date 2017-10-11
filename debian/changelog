@@ -1,3 +1,13 @@
+grml-crypt (0.27) unstable; urgency=medium
+
+  * [5cdd558] Drop dependency on realpath, since jessie being part of
+    coreutils
+  * [f1f7763] wrap-and-sort debian/
+  * [b036663] Bump Standards-Version to 4.1.1
+  * [73d02fc] Bump debian/compat to 9
+
+ -- Michael Prokop <mika@grml.org>  Thu, 12 Oct 2017 00:26:41 +0200
+
 grml-crypt (0.26) unstable; urgency=medium
 
   * [5347d32] Fix several typos
