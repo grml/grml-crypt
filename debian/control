@@ -7,7 +7,7 @@ Build-Depends:
  debhelper (>= 5),
  docbook-xsl,
  xsltproc,
-Standards-Version: 3.9.5
+Standards-Version: 4.1.1
 Homepage: http://git.grml.org/?p=grml-crypt.git
 Vcs-git: git://git.grml.org/grml-crypt.git
 Vcs-Browser: http://git.grml.org/?p=grml-crypt.git
