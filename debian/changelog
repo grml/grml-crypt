@@ -1,3 +1,9 @@
+grml-crypt (0.28) unstable; urgency=medium
+
+  * [4b09ea6] docs: don't download DTDs when building docs
+
+ -- Michael Prokop <mika@grml.org>  Fri, 11 Nov 2022 17:05:31 +0100
+
 grml-crypt (0.27) unstable; urgency=medium
 
   * [5cdd558] Drop dependency on realpath, since jessie being part of
