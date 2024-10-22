@@ -9,8 +9,8 @@ Build-Depends:
  xsltproc,
 Standards-Version: 4.1.1
 Homepage: http://git.grml.org/?p=grml-crypt.git
-Vcs-git: git://git.grml.org/grml-crypt.git
-Vcs-Browser: http://git.grml.org/?p=grml-crypt.git
+Vcs-git: https://github.com/grml/grml-crypt.git
+Vcs-Browser: https://github.com/grml/grml-crypt
 Origin: Grml
 Bugs: mailto:bugs@grml.org
 
