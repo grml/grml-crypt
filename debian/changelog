@@ -1,3 +1,13 @@
+grml-crypt (0.29) unstable; urgency=medium
+
+  [ Chris Hofstaedtler ]
+  * [982a36e] debian: update Vcs-Git and Vcs-Browser
+
+  [ Michael Prokop ]
+  * [eba8ca4] Refresh Debian packaging and use new debhelper style
+
+ -- Michael Prokop <mika@grml.org>  Wed, 20 Nov 2024 12:22:44 +0100
+
 grml-crypt (0.28) unstable; urgency=medium
 
   * [4b09ea6] docs: don't download DTDs when building docs
