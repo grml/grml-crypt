@@ -24,7 +24,6 @@ DEV_MAPPER_="/dev/mapper"
 CRYPTSETUP_="cryptsetup"
 IS_IMAGE_='false'
 SIZE_="10"
-SIZE_SET_='false'
 FSTYPE_="vfat"
 TARGET_=""
 VERIFY_PW_=""
@@ -378,7 +377,7 @@ function actionFormat
 
 while getopts "s:t:rzoyfFm:hvS:C:I:A:X:" opt; do
   case "$opt" in
-    s) SIZE_="$OPTARG"; SIZE_SET_='true' ;;
+    s) SIZE_="$OPTARG" ;;
     t) FSTYPE_="$OPTARG" ;;
     r) READONLY_SET_='true' ;;
     z) let OPTIMIZING_LEVEL_=$OPTIMIZING_LEVEL_+1
