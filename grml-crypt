@@ -31,7 +31,6 @@ VERIFY_PW_=""
 MKFS_=""
 DM_NAME_=""
 DM_PATH_=""
-ACTION_=""
 DM_PREFIX_="grml-crypt_"
 FORCE_='false'
 FSCK_='false'
@@ -447,9 +446,9 @@ ORIG_TARGET_="$TARGET_"
 MOUNT_POINT_="$3"
 
 case "$1" in
-  format) ACTION_='format'; actionFormat ;;
-  start)  ACTION_='start'; actionStart ;;
-  stop)  ACTION_='stop'; actionStop "$TARGET_" ;;
+  format) actionFormat ;;
+  start)  actionStart ;;
+  stop)  actionStop "$TARGET_" ;;
   *)  printUsage ;;
 esac
 
