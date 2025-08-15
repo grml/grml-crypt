@@ -8,16 +8,15 @@
 
 
 ###
-### __INCLUDES
-###
-. /etc/grml/sh-lib
-#. /etc/grml/sysexits-sh
-
-
-
-###
 ### __VARIABLES
 ###
+
+# Extracted from sh-lib
+PROG_NAME__="$(basename "$0")"
+VERBOSE__=0
+# >= level and the function will print the message
+EPRINT__=1
+DPRINT__=3
 
 verbose_=0
 DEV_MAPPER_="/dev/mapper"
@@ -370,6 +369,192 @@ function actionFormat
   fi
 }
 
+# Extracted functions from sh-lib
+
+vprint()
+{
+  local level_="$1"
+  local type_="$2"
+  local message_="$3"
+
+  if [ "$VERBOSE__" -ge "$level_" ] && [ -n "$message_" ]; then
+    echo -n "$type_" >&2
+    echo "$message_" >&2
+  fi
+}
+
+# print error output
+eprint()
+{
+  # FIXME vprint should be a var, because we want to call user-defined functions
+  # global var (there should be a syslog, and vprint + syslog function)
+  vprint $EPRINT__ "Error - " "$1"
+}
+
+# print debug output (function intern errors)
+dprint()
+{
+  vprint $DPRINT__ "Debug - " "$1"
+}
+
+# for program notice messages
+notice()
+{
+  vprint $EPRINT__ "Notice - " "$1"
+}
+
+die()
+{
+  local error_message_="$1"   # print this error message
+  local exit_code_="$2"  # command exited with this exit code
+
+  echo -n "PANIC: $error_message_" >&2
+  if [ -n "$2" ]; then
+    echo "; ret($exit_code_)" >&2
+  else
+    echo >&2
+  fi
+
+  kill $$
+}
+
+warn()
+{
+  local error_message_="$1"   # print this error message
+  local exit_code_="$2"  # command exits with this exit code
+
+  echo -n "WARN: $error_message_" >&2
+  if [ -n "$exit_code_" ]; then
+    echo "; ret($exit_code_)" >&2
+  else
+    echo >&2
+  fi
+}
+
+##
+# ATTENTION... THIS FUNCTION IS A BIG SECURITY HOLE
+# this function will be changed in future release
+##
+# I don't want to write exit status control stuff every time
+execute()
+{
+  local to_exec_="$1"   # command to execute
+  local error_function_=${2:-"eprint"}    # function to call on error
+  local message_="$3"   # user supplied error message
+
+  local ret_=''
+
+  # NOT A GOOD IDEA
+  eval "$to_exec_"
+  ret_=$?
+
+  if [ $ret_ -ne 0 ]; then
+    if [ -z "$message_" ]; then
+      $error_function_ "problems executing ( $to_exec_ )" "$ret_"
+    else
+      $error_function_ "$message_" "$ret_"
+    fi
+  fi
+  dprint "exec-$error_function_: ( $to_exec_ ) ret($ret_)"
+  return $ret_
+}
+
+# if the file DOES exist, everything is fine
+isExistent()
+{
+  local file_to_test_="$1"    # file to test
+  local error_function_=${2:-"eprint"}    # function to call on error
+  local message_="$3"    # user supplied error message
+
+  if [ ! -e "$file_to_test_" ]; then
+    if [ -z "$message_" ]; then
+      $error_function_ "file does not exist \"$file_to_test_\"" 66
+    else
+      $error_function_ "$message_"
+    fi
+    return 1
+  fi
+  dprint "isExistent(): file \"$1\" does exist => ready to go"
+  return 0
+}
+
+checkRoot()
+{
+  local error_function_=${1:-"eprint"}    # function to call on error
+  local message_="$2"    # user supplied error message
+
+  local user_id_=''
+  user_id_=$(id -u)
+  if [ "$user_id_" != "0" ]; then
+    if [ -z "$message_" ]; then
+      $error_function_ "UID \"$user_id_\" is not \"0\"" 77
+    else
+      $error_function_ "$message_"
+    fi
+    return 1
+  else
+    dprint "checkRoot(): accepted, UID matches \"0\""
+    return 0
+  fi
+}
+
+setVerbose()
+{
+  VERBOSE__=${1:-1}
+}
+
+isGrml()
+{
+  if [ -f /etc/grml_version ] ; then
+    dprint "isGrml(): this seems to be a grml system"
+    return 0
+  else
+    dprint "isGrml(): this is not a grml system"
+    return 1
+  fi
+}
+
+# LOSETUP HELPER FUNCTION {{{
+# print next free /dev/loop* to stdout
+findNextFreeLoop()
+{
+  local error_function_=${1:-"eprint"}    # function to call on error
+  local message_="$2"    # user supplied error message
+
+  local tmp_=''   # tmp
+  local i=''      # counter
+  local ret_=''   # saved return value
+
+  for i in 'losetup' 'losetup.orig'; do
+    if tmp_=$($i -f 2>/dev/null); then
+      echo "$tmp_"
+      return 0
+    fi
+  done
+
+  # we have to search
+  dprint 'findNextFreeLoop(): losetup does not recognize option -f, searching next free loop device'
+  for i in $(seq 0 100); do
+    test -e "/dev/loop$i" || continue
+    losetup "/dev/loop$i" >/dev/null 2>&1
+    ret_=$?
+    case "$ret_" in
+      2) continue ;;  # losetup could not get status of loopdevice (EPERM)
+      0) continue ;;  # device exist
+      1) echo "/dev/loop$i"; return 0 ;;  # device does not exist and no error
+      ?) continue ;;  # return value not available in 'man losetup'
+    esac
+  done
+
+  # could not find a loopdevice
+  if [ -z "$message_" ]; then
+    $error_function_ "could not find a free loop device"
+  else
+    $error_function_ "$message_"
+  fi
+  return 1
+}
+# }}}
 
 
 ###
@@ -409,7 +594,6 @@ shift $((OPTIND - 1))  # set ARGV to the first not parsed commandline parameter
 setVerbose $verbose_
 
 checkRoot die "You have to be root to use this program"
-disableSyslog
 
 if [[ $1 == 'help' ]]; then
   printUsage
