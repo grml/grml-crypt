@@ -151,8 +151,7 @@ function formatDevice
     #fi
   fi
 
-  execute "$MKFS_ $DM_PATH_ >/dev/null" warn
-  if [[ $? != 0 ]]; then
+  if ! execute "$MKFS_ $DM_PATH_ >/dev/null" warn; then
     execute "$CRYPTSETUP_ luksClose $DM_NAME_"
     warn "could not create filesystem on $DM_PATH_" 1
     return 1
@@ -183,7 +182,7 @@ function actionStart
   if [ ! -b "$TARGET_" ]; then
     notice "Operating on a file"
     isExistent "$TARGET_" die "image does not exist"
-    TARGET_=`findNextFreeLoop` || die "could not find a free loop device"
+    TARGET_=$(findNextFreeLoop) || die "could not find a free loop device"
 
     # TARGET_ is now /dev/loop<x>
     execute "losetup $TARGET_ $ORIG_TARGET_" die
@@ -214,12 +213,12 @@ function actionStop
   ret_=0
 
   isExistent "$mp_" die
-  tmp_=`realpath $mp_` || die "could not get realpath of $mp_"
+  tmp_=$(realpath "$mp_") || die "could not get realpath of $mp_"
   dprint "realpath_=\"$tmp_\""
 
-  dm_path_=`mount |grep "$tmp_ "` || die "$tmp_ is not mounted"
+  dm_path_=$(mount |grep "$tmp_ ") || die "$tmp_ is not mounted"
   dprint "dm_path_=\"$dm_path_\""
-  dm_path_=`echo $dm_path_ |awk '{print $1}'` || die "could not get devicemapper name for $tmp_"
+  dm_path_=$(echo "$dm_path_" |awk '{print $1}') || die "could not get devicemapper name for $tmp_"
   dprint "dm_path_=\"$dm_path_\""
 
   # check for symlinks
@@ -240,8 +239,8 @@ function actionStop
   dm_name_="${dm_path_##*/}"
   dprint "dm_name_=\"$dm_name_\""
 
-  dmsetup info $dm_name_ >/dev/null ||die "$dm_name_ is not active"
-  device_=`$CRYPTSETUP_ status $dm_name_ |awk '/device:/{print $2}'` || \
+  dmsetup info "$dm_name_" >/dev/null ||die "$dm_name_ is not active"
+  device_=$($CRYPTSETUP_ status "$dm_name_" |awk '/device:/{print $2}') || \
     die "could not get underlying device of $dm_path_"
   dprint "device_=\"$device_\""
 
@@ -250,10 +249,12 @@ function actionStop
     rmdir "$MOUNT_POINT_"
   fi
   execute "$CRYPTSETUP_ luksClose $dm_name_" die "could not close $dm_path_"
-  echo "$device_" |grep loop &>/dev/null && execute "losetup -d $device_" \
-    die "could not delete loop device $device_" || \
+  if echo "$device_" |grep loop &>/dev/null; then
+    execute "losetup -d $device_" die "could not delete loop device $device_"
+  else
     execute "losetup -d $device_ &>/dev/null" eprint "could not delete loop device $device_, \
 this device possibly is not a loop device => maybe bogus error"
+  fi
   notice "$mp_ successfully unmounted/closed/deleted"
 }
 
@@ -265,7 +266,7 @@ function yesDialog
   echo "========" >&2
   echo -n "$msg_" >&2
   echo -n " (type uppercase yes): " >&2
-  read input
+  read -r input
   if [[ $input == 'YES' ]]; then
     return 0
   fi
@@ -280,7 +281,7 @@ function actionFormat
   init_='init'
   local ddcmd_
 
-  if (( $SIZE_ < 3 )); then
+  if (( SIZE_ < 3 )); then
     die "the minimum size of an encrypted luks partition should be 2"
   fi
 
@@ -309,7 +310,7 @@ function actionFormat
       fi
     fi
 
-    TARGET_=`findNextFreeLoop` || die "could not find a free loop device"
+    TARGET_=$(findNextFreeLoop) || die "could not find a free loop device"
 
     # TARGET_ is now /dev/loop<x>
     execute "losetup $TARGET_ $ORIG_TARGET_" die
@@ -348,7 +349,7 @@ function actionFormat
   fi
 
   # formatDevice was successfully
-  if (( $ret_ == 0 )); then
+  if (( ret_ == 0 )); then
     # a mountpoint was given (don't luksClose the device)
     local mount_point_exists_='true'
     test -d "$MOUNT_POINT_" || mount_point_exists_='false'
@@ -380,10 +381,10 @@ while getopts "s:t:rzoyfFm:hvS:C:I:A:X:" opt; do
     s) SIZE_="$OPTARG" ;;
     t) FSTYPE_="$OPTARG" ;;
     r) READONLY_SET_='true' ;;
-    z) let OPTIMIZING_LEVEL_=$OPTIMIZING_LEVEL_+1
+    z) (( OPTIMIZING_LEVEL_++ ))
         ENTROPY_SOURCE_='/dev/zero'
         warn 'initialising from INSECURE source /dev/zero' ;;
-    o) let OPTIMIZING_LEVEL_=$OPTIMIZING_LEVEL_+1
+    o) (( OPTIMIZING_LEVEL_++ ))
         OPTIMIZED_MODE_SET_='true' ;;
     y) VERIFY_PW_="--verify-passphrase" ;;
     f) FORCE_='true' ;;
@@ -396,7 +397,7 @@ while getopts "s:t:rzoyfFm:hvS:C:I:A:X:" opt; do
     X) FSCK_EXTRA_OPTS_="$OPTARG" ;;
     m) ADDITIONAL_MOUNT_ARGS_="$OPTARG" ;;
     h) printUsage; exit ;;
-    v) let verbose_=$verbose_+1 ;;
+    v) (( verbose_++ )) ;;
     S) CIPHER_SIZE_="$OPTARG" ;;
     C) CIPHER_="$OPTARG" ;;
     I) ITERATION_TIME_="$OPTARG" ;;
@@ -404,7 +405,7 @@ while getopts "s:t:rzoyfFm:hvS:C:I:A:X:" opt; do
     ?) printUsage; exit 64 ;;
   esac
 done
-shift $(($OPTIND - 1))  # set ARGV to the first not parsed commandline parameter
+shift $((OPTIND - 1))  # set ARGV to the first not parsed commandline parameter
 setVerbose $verbose_
 
 checkRoot die "You have to be root to use this program"
@@ -418,14 +419,13 @@ if (( $# < 2 )); then
   printUsage
   die "wrong number of arguments ($#)" 1
 fi
-if (( $OPTIMIZING_LEVEL_ > 1 )); then
+if (( OPTIMIZING_LEVEL_ > 1 )); then
   printUsage
   die "please choose ONE initialisation method"
 fi
 TARGET_="$2"
 
-MKFS_="`which mkfs.$FSTYPE_`"
-if [ $? != "0" ]; then
+if ! MKFS_="$(which "mkfs.$FSTYPE_")"; then
   die "invalid filesystem type \"$FSTYPE_\"" 1
 fi
 
@@ -439,7 +439,7 @@ case "$ret_" in
   *)  warn "problems executing $CRYPTSETUP_" $ret_
 esac
 
-DM_NAME_="`getDMName $TARGET_`"
+DM_NAME_="$(getDMName "$TARGET_")"
 DM_PATH_="$DEV_MAPPER_/$DM_NAME_"
 ORIG_TARGET_="$TARGET_"
 MOUNT_POINT_="$3"
