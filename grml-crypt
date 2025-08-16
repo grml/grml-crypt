@@ -347,7 +347,7 @@ function actionFormat
     ret_=$?
   fi
 
-  # formatDevice was successfully
+  # formatDevice was successful
   if (( ret_ == 0 )); then
     # a mountpoint was given (don't luksClose the device)
     local mount_point_exists_='true'
