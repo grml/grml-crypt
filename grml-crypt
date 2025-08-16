@@ -480,17 +480,10 @@ isExistent()
 
 checkRoot()
 {
-  local error_function_=${1:-"eprint"}    # function to call on error
-  local message_="$2"    # user supplied error message
-
   local user_id_=''
   user_id_=$(id -u)
   if [ "$user_id_" != "0" ]; then
-    if [ -z "$message_" ]; then
-      $error_function_ "UID \"$user_id_\" is not \"0\"" 77
-    else
-      $error_function_ "$message_"
-    fi
+    die "You have to be root to use this program"
     return 1
   else
     dprint "checkRoot(): accepted, UID matches \"0\""
@@ -586,7 +579,7 @@ done
 shift $((OPTIND - 1))  # set ARGV to the first not parsed commandline parameter
 setVerbose $verbose_
 
-checkRoot die "You have to be root to use this program"
+checkRoot
 
 if [[ $1 == 'help' ]]; then
   printUsage
