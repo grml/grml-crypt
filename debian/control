@@ -20,7 +20,6 @@ Architecture: all
 Depends:
  cryptsetup-luks | cryptsetup (>=1.0.1-16),
  dmsetup,
- grml-shlib (>=1.02.07),
  ${misc:Depends},
 Description: wrapper around cryptsetup-luks
  This software should provide an easy wrapper around cryptsetup-luks,
