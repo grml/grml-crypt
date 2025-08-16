@@ -1,3 +1,17 @@
+grml-crypt (0.30) unstable; urgency=medium
+
+  * [a65a28b] Remove unused ACTION_ variable
+  * [ea1d568] Remove unused SIZE_SET_ variable
+  * [45df76b] Add simple GHA CI workflow for shellcheck and building .debs
+  * [f6abd6c] Fix shellcheck warnings
+  * [b6a729a] Inline grml-shlib
+  * [79fb872] findNextFreeLoop: drop unused arguments
+  * [50072fa] checkRoot: inline static arguments
+  * [a93d5fa] actionFormat: fix typo
+  * [f33d82e] Import debian/gbp.conf
+
+ -- Chris Hofstaedtler <ch@grml.org>  Sun, 17 Aug 2025 00:37:45 +0200
+
 grml-crypt (0.29) unstable; urgency=medium
 
   [ Chris Hofstaedtler ]
