@@ -518,9 +518,6 @@ isGrml()
 # print next free /dev/loop* to stdout
 findNextFreeLoop()
 {
-  local error_function_=${1:-"eprint"}    # function to call on error
-  local message_="$2"    # user supplied error message
-
   local tmp_=''   # tmp
   local i=''      # counter
   local ret_=''   # saved return value
@@ -547,11 +544,7 @@ findNextFreeLoop()
   done
 
   # could not find a loopdevice
-  if [ -z "$message_" ]; then
-    $error_function_ "could not find a free loop device"
-  else
-    $error_function_ "$message_"
-  fi
+  eprint "could not find a free loop device"
   return 1
 }
 # }}}
